@@ -66,5 +66,11 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+		<key>NSCameraUsageDescription</key>
+    	<string>CampusFire uses the camera to photograph campus incidents.</string>
+
+    	<key>NSPhotoLibraryUsageDescription</key>
+    	<string>CampusFire uses the photo library to attach images to incident reports.</string>
+
 </dict>
 </plist>

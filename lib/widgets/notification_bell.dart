@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,101 +12,273 @@ class NotificationBell extends StatefulWidget {
   final VoidCallback onPressed;
 
   @override
-  State<NotificationBell> createState() => _NotificationBellState();
+  State<NotificationBell> createState() =>
+      _NotificationBellState();
 }
 
-class _NotificationBellState extends State<NotificationBell> {
-  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? subscription;
+class _NotificationBellState
+    extends State<NotificationBell> {
+  static const Color navy = Color(0xFF12355B);
+  static const Color coral = Color(0xFFFF5A3C);
 
-  int unreadCount = 0;
-  bool firstLoad = true;
+  int previousCount = 0;
+  bool countLoaded = false;
+  bool markingAsRead = false;
 
-  @override
-  void initState() {
-    super.initState();
-    listenForNotifications();
-  }
-
-  // listening for new unread notifications
-  void listenForNotifications() {
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
+  // checking whether a new notification arrived
+  void checkForNewNotification(int currentCount) {
+    if (!countLoaded) {
+      previousCount = currentCount;
+      countLoaded = true;
       return;
     }
 
-    subscription = FirebaseFirestore.instance
-        .collection('notifications')
-        .where('userId', isEqualTo: user.uid)
-        .where('isRead', isEqualTo: false)
-        .snapshots()
-        .listen((snapshot) {
-      final newCount = snapshot.docs.length;
+    final notificationAdded =
+        currentCount > previousCount;
 
-      // playing a sound when a new notification arrives
-      if (!firstLoad && newCount > unreadCount) {
-        SystemSound.play(SystemSoundType.alert);
-        HapticFeedback.mediumImpact();
-      }
+    previousCount = currentCount;
 
-      if (mounted) {
-        setState(() {
-          unreadCount = newCount;
-          firstLoad = false;
-        });
-      }
+    if (!notificationAdded) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      // playing the notification sound
+      SystemSound.play(SystemSoundType.alert);
+      HapticFeedback.mediumImpact();
+
+      final messenger =
+      ScaffoldMessenger.maybeOf(context);
+
+      messenger?.hideCurrentSnackBar();
+
+      messenger?.showSnackBar(
+        SnackBar(
+          content: const Row(
+            children: [
+              Icon(
+                Icons.notifications_active_rounded,
+                color: Colors.white,
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'You have a new CampusFire update.',
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: navy,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 3),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+        ),
+      );
     });
   }
 
-  @override
-  void dispose() {
-    subscription?.cancel();
-    super.dispose();
+  // marking reports and notifications as read
+  Future<void> markEverythingAsRead({
+    required List<
+        DocumentReference<Map<String, dynamic>>>
+    incidents,
+    required List<
+        DocumentReference<Map<String, dynamic>>>
+    notifications,
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    if (incidents.isEmpty && notifications.isEmpty) {
+      widget.onPressed();
+      return;
+    }
+
+    setState(() {
+      markingAsRead = true;
+    });
+
+    try {
+      final firestore = FirebaseFirestore.instance;
+      final batch = firestore.batch();
+
+      // marking new incident reports as seen
+      for (final incident in incidents) {
+        batch.update(incident, {
+          'readBy': FieldValue.arrayUnion(
+            [user.uid],
+          ),
+        });
+      }
+
+      // marking personal status notifications as read
+      for (final notification in notifications) {
+        batch.update(notification, {
+          'isRead': true,
+        });
+      }
+
+      await batch.commit();
+    } catch (error) {
+      debugPrint(
+        'Could not mark notifications as read: $error',
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          markingAsRead = false;
+        });
+      }
+
+      widget.onPressed();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        IconButton(
-          onPressed: widget.onPressed,
-          icon: const Icon(
-            Icons.notifications_none_rounded,
-            color: Color(0xFF12355B),
-            size: 28,
-          ),
-        ),
+    final user = FirebaseAuth.instance.currentUser;
 
-        if (unreadCount > 0)
-          Positioned(
-            right: 3,
-            top: 2,
-            child: Container(
-              constraints: const BoxConstraints(
-                minWidth: 19,
-                minHeight: 19,
+    if (user == null) {
+      return const SizedBox();
+    }
+
+    // listening for new incident reports
+    return StreamBuilder<
+        QuerySnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance
+          .collection('incidents')
+          .snapshots(),
+      builder: (context, incidentSnapshot) {
+        final incidentDocuments =
+            incidentSnapshot.data?.docs ?? [];
+
+        final unreadIncidents =
+        incidentDocuments.where((incident) {
+          final data = incident.data();
+
+          final reporterId =
+              data['reportedBy']?.toString() ?? '';
+
+          final readBy = List<String>.from(
+            data['readBy'] ?? [],
+          );
+
+          // not notifying users about their own reports
+          return reporterId != user.uid &&
+              !readBy.contains(user.uid);
+        }).toList();
+
+        // listening for personal status notifications
+        return StreamBuilder<
+            QuerySnapshot<Map<String, dynamic>>>(
+          stream: FirebaseFirestore.instance
+              .collection('notifications')
+              .where(
+            'userId',
+            isEqualTo: user.uid,
+          )
+              .snapshots(),
+          builder: (context, notificationSnapshot) {
+            final notificationDocuments =
+                notificationSnapshot.data?.docs ?? [];
+
+            final unreadNotifications =
+            notificationDocuments.where((notification) {
+              return notification.data()['isRead'] !=
+                  true;
+            }).toList();
+
+            final unreadCount =
+                unreadIncidents.length +
+                    unreadNotifications.length;
+
+            checkForNewNotification(unreadCount);
+
+            return IconButton(
+              onPressed: markingAsRead
+                  ? null
+                  : () {
+                markEverythingAsRead(
+                  incidents: unreadIncidents
+                      .map(
+                        (incident) =>
+                    incident.reference,
+                  )
+                      .toList(),
+                  notifications:
+                  unreadNotifications
+                      .map(
+                        (notification) =>
+                    notification.reference,
+                  )
+                      .toList(),
+                );
+              },
+              icon: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  markingAsRead
+                      ? const SizedBox(
+                    width: 26,
+                    height: 26,
+                    child:
+                    CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: navy,
+                    ),
+                  )
+                      : const Icon(
+                    Icons
+                        .notifications_none_rounded,
+                    color: navy,
+                    size: 28,
+                  ),
+
+                  if (unreadCount > 0)
+                    Positioned(
+                      right: -8,
+                      top: -8,
+                      child: Container(
+                        constraints: const BoxConstraints(
+                          minWidth: 21,
+                          minHeight: 21,
+                        ),
+                        padding:
+                        const EdgeInsets.symmetric(
+                          horizontal: 5,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: coral,
+                          borderRadius:
+                          BorderRadius.circular(20),
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 2,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          unreadCount > 99
+                              ? '99+'
+                              : '$unreadCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 5,
-                vertical: 2,
-              ),
-              decoration: const BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                unreadCount > 99 ? '99+' : '$unreadCount',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-      ],
+            );
+          },
+        );
+      },
     );
   }
 }

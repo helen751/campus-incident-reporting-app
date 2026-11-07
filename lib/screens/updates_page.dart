@@ -277,6 +277,140 @@ class _UpdatesPageState extends State<UpdatesPage>
     }
   }
 
+  // deleting a fake or invalid report as an admin
+  Future<void> deleteIncident({
+    required String incidentId,
+    required String incidentTitle,
+  }) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          icon: Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              color: Colors.red.withOpacity(0.10),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.delete_forever_rounded,
+              color: Colors.red,
+              size: 30,
+            ),
+          ),
+          title: const Text(
+            'Delete this report?',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: navy,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Text(
+            '"$incidentTitle" will be permanently removed. '
+                'Only delete fake, duplicate, or invalid reports.',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.black54,
+              height: 1.5,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, false);
+              },
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  color: navy,
+                ),
+              ),
+            ),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pop(dialogContext, true);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(13),
+                ),
+              ),
+              icon: const Icon(
+                Icons.delete_outline_rounded,
+                size: 19,
+              ),
+              label: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) {
+      return;
+    }
+
+    try {
+      final firestore = FirebaseFirestore.instance;
+
+      // getting notifications connected to the incident
+      final notifications = await firestore
+          .collection('notifications')
+          .where(
+        'incidentId',
+        isEqualTo: incidentId,
+      )
+          .get();
+
+      final batch = firestore.batch();
+
+      // deleting the incident
+      batch.delete(
+        firestore.collection('incidents').doc(incidentId),
+      );
+
+      // deleting notifications connected to the incident
+      for (final notification in notifications.docs) {
+        batch.delete(notification.reference);
+      }
+
+      await batch.commit();
+
+      if (!mounted) return;
+
+      // closing the incident details
+      Navigator.pop(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'The report was deleted successfully.',
+          ),
+          backgroundColor: mint,
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'The report could not be deleted: $error',
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   // opening the incident details
   Future<void> openIncident(
       Map<String, dynamic> incident,
@@ -631,6 +765,47 @@ class _UpdatesPageState extends State<UpdatesPage>
                                   newStatus: newStatus,
                                 );
                               },
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 18),
+
+                        const Divider(
+                          color: Color(0xFFE1E8F0),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              deleteIncident(
+                                incidentId: incidentId,
+                                incidentTitle: title,
+                              );
+                            },
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.red,
+                              side: BorderSide(
+                                color: Colors.red.withOpacity(0.35),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            icon: const Icon(
+                              Icons.delete_outline_rounded,
+                            ),
+                            label: const Text(
+                              'Delete fake report',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),

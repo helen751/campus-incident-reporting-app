@@ -128,9 +128,7 @@ class AuthProvider extends ChangeNotifier {
         'fullName': fullName.trim(),
         'email': email.trim(),
         'role': role,
-        'status': role == 'Campus Admin'
-            ? 'pending'
-            : 'active',
+        'status': 'active',
         'createdAt': FieldValue.serverTimestamp(),
       })
           .timeout(const Duration(seconds: 20));
