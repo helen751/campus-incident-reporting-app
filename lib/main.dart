@@ -56,6 +56,11 @@ class AuthChecker extends StatelessWidget {
           return const LoginPage();
         }
 
+        // stopping unverified users from opening the dashboard
+        if (!user.emailVerified) {
+          return const LoginPage();
+        }
+
         // reading the signed-in user's role
         return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
           stream: FirebaseFirestore.instance

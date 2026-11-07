@@ -46,21 +46,22 @@ class AuthProvider extends ChangeNotifier {
 
       // getting the latest verification status
       await user.reload();
-      user = _auth.currentUser;
+      final refreshedUser = _auth.currentUser;
 
-      if (user == null) {
+      if (refreshedUser == null) {
         errorMessage = 'We could not load your account.';
         return false;
       }
 
-      // stopping unverified users from entering the dashboard
-      if (!user.emailVerified) {
+// stopping unverified users from signing in
+      if (!refreshedUser.emailVerified) {
         await _auth.signOut();
-
-        errorMessage = 'Your email is not verified. Open the verification link sent to your ALU email.';
-
+        errorMessage = 'Please verify your email before signing in.';
         return false;
       }
+
+// refreshing the Firebase token used by Firestore rules
+      await refreshedUser.getIdToken(true);
 
       successMessage = 'Welcome back!';
       return true;

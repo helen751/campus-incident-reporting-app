@@ -839,12 +839,12 @@ class _UpdatesPageState extends State<UpdatesPage>
                                   ),
                                 ),
                               ],
-                              onChanged: (newStatus) {
+                              onChanged: (newStatus) async {
                                 if (newStatus == null || newStatus == status) {
                                   return;
                                 }
 
-                                updateIncidentStatus(
+                                await updateIncidentStatus(
                                   incidentId: incidentId,
                                   reporterId: reporterId,
                                   newStatus: newStatus,
