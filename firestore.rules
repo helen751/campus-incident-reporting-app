@@ -1,0 +1,171 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // checking if the user is signed in
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // checking if the email is verified
+    function verifiedUser() {
+      return signedIn()
+        && request.auth.token.email_verified == true;
+    }
+
+    // getting the current user
+    function currentUserDocument() {
+      return get(
+        /databases/$(database)/documents/users/$(request.auth.uid)
+      );
+    }
+
+    // checking if the user is a campus admin
+    function isStaff() {
+      return verifiedUser()
+        && request.auth.token.email
+            .matches('.*@alueducation[.]com$')
+        && exists(
+          /databases/$(database)/documents/users/$(request.auth.uid)
+        )
+        && currentUserDocument().data.role == 'Campus Admin'
+        && currentUserDocument().data.status == 'active';
+    }
+
+
+    match /users/{userId} {
+
+      // allowing a user to create their account
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.status == 'active'
+        && (
+          (
+            request.resource.data.role == 'Student'
+            && request.auth.token.email
+                .matches('.*@alustudent[.]com$')
+          )
+          ||
+          (
+            request.resource.data.role == 'Campus Admin'
+            && request.auth.token.email
+                .matches('.*@alueducation[.]com$')
+          )
+        );
+
+      // allowing users to read their account
+      allow read: if verifiedUser()
+        && (
+          request.auth.uid == userId
+          || isStaff()
+        );
+
+      // allowing users to update their account
+      allow update: if verifiedUser()
+        && (
+          isStaff()
+          ||
+          (
+            request.auth.uid == userId
+            && request.resource.data.role
+                == resource.data.role
+            && request.resource.data.status
+                == resource.data.status
+          )
+        );
+
+      // stopping users from deleting accounts
+      allow delete: if false;
+    }
+
+
+    match /incidents/{incidentId} {
+
+      // allowing a user to create a report
+      allow create: if verifiedUser()
+        && request.resource.data.reportedBy
+            == request.auth.uid
+        && request.resource.data.status
+            == 'Submitted'
+        && (
+          !('readBy' in request.resource.data)
+          || request.resource.data.readBy
+              == [request.auth.uid]
+        );
+
+      // allowing users to view reports
+      allow read: if verifiedUser();
+
+      // allowing admins to update reports
+      // allowing users to mark reports as read
+      allow update: if isStaff()
+        || canMarkIncidentAsRead();
+
+      // allowing admins to delete fake reports
+      allow delete: if isStaff();
+
+
+      // checking if the user is only marking a report as read
+      function canMarkIncidentAsRead() {
+        let previousReaders =
+          resource.data.get('readBy', []);
+
+        return verifiedUser()
+          && request.resource.data
+              .diff(resource.data)
+              .affectedKeys()
+              .hasOnly(['readBy'])
+          && request.resource.data.readBy is list
+          && request.resource.data.readBy
+              .hasAll(previousReaders)
+          && request.resource.data.readBy.size()
+              == previousReaders.size() + 1
+          && request.auth.uid
+              in request.resource.data.readBy;
+      }
+    }
+
+
+    match /notifications/{notificationId} {
+
+      // allowing users to create their notifications
+      allow create: if verifiedUser()
+        && (
+          request.resource.data.userId
+              == request.auth.uid
+          || isStaff()
+        );
+
+      // allowing users to read their notifications
+      allow read: if verifiedUser()
+        && (
+          resource.data.userId
+              == request.auth.uid
+          || isStaff()
+        );
+
+      // allowing users to mark notifications as read
+      allow update: if isStaff()
+        ||
+        (
+          verifiedUser()
+          && resource.data.userId
+              == request.auth.uid
+          && request.resource.data
+              .diff(resource.data)
+              .affectedKeys()
+              .hasOnly(['isRead'])
+          && request.resource.data.isRead == true
+        );
+
+      // allowing users to delete their notifications
+      allow delete: if verifiedUser()
+        && (
+          resource.data.userId
+              == request.auth.uid
+          || isStaff()
+        );
+    }
+  }
+}

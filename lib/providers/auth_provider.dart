@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
 
 class AuthProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -24,19 +25,16 @@ class AuthProvider extends ChangeNotifier {
   }
 
   // signing the user into CampusFire
-  Future<bool> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<bool> signIn({required String email, required String password}) async {
     clearMessages();
     changeLoading(true);
 
     try {
       final result = await _auth
           .signInWithEmailAndPassword(
-        email: email.trim(),
-        password: password.trim(),
-      )
+            email: email.trim(),
+            password: password.trim(),
+          )
           .timeout(const Duration(seconds: 20));
 
       User? user = result.user;
@@ -59,8 +57,7 @@ class AuthProvider extends ChangeNotifier {
       if (!user.emailVerified) {
         await _auth.signOut();
 
-        errorMessage =
-        'Your email is not verified. Open the verification link sent to your ALU email.';
+        errorMessage = 'Your email is not verified. Open the verification link sent to your ALU email.';
 
         return false;
       }
@@ -69,7 +66,7 @@ class AuthProvider extends ChangeNotifier {
       return true;
     } on TimeoutException {
       errorMessage =
-      'Firebase took too long to respond. Check your internet connection.';
+          'Firebase took too long to respond. Check your internet connection.';
 
       return false;
     } on FirebaseAuthException catch (error) {
@@ -84,6 +81,7 @@ class AuthProvider extends ChangeNotifier {
       changeLoading(false);
     }
   }
+
   // creating a new CampusFire account
   Future<bool> signUp({
     required String fullName,
@@ -95,13 +93,11 @@ class AuthProvider extends ChangeNotifier {
     changeLoading(true);
 
     try {
-      debugPrint('1. Starting account creation');
-
       final result = await _auth
           .createUserWithEmailAndPassword(
-        email: email.trim(),
-        password: password.trim(),
-      )
+            email: email.trim(),
+            password: password.trim(),
+          )
           .timeout(const Duration(seconds: 20));
 
       final user = result.user;
@@ -111,45 +107,31 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
 
-      debugPrint('2. Firebase account created');
-
       // updating the user's Firebase name
       await user
           .updateDisplayName(fullName.trim())
           .timeout(const Duration(seconds: 10));
-
-      debugPrint('3. Display name updated');
 
       // storing the user's information in Firestore
       await _firestore
           .collection('users')
           .doc(user.uid)
           .set({
-        'fullName': fullName.trim(),
-        'email': email.trim(),
-        'role': role,
-        'status': 'active',
-        'createdAt': FieldValue.serverTimestamp(),
-      })
+            'fullName': fullName.trim(),
+            'email': email.trim(),
+            'role': role,
+            'status': 'active',
+            'createdAt': FieldValue.serverTimestamp(),
+          })
           .timeout(const Duration(seconds: 20));
 
-      debugPrint('4. User saved to Firestore');
-
-
       // sending the verification email
-      await user
-          .sendEmailVerification()
-          .timeout(const Duration(seconds: 15));
+      await user.sendEmailVerification().timeout(const Duration(seconds: 15));
 
-      debugPrint('5. Verification email sent');
+      // signing out until the email is verified
+      await _auth.signOut().timeout(const Duration(seconds: 10));
 
-// signing out until the email is verified
-      await _auth
-          .signOut()
-          .timeout(const Duration(seconds: 10));
-
-      successMessage =
-      'Account created. Check your ALU email and verify your account before signing in.';
+      successMessage = 'Account created. Check your ALU email and verify your account before signing in.';
 
       return true;
     } on TimeoutException {
@@ -160,8 +142,7 @@ class AuthProvider extends ChangeNotifier {
         await _auth.signOut();
       }
 
-      errorMessage =
-      'Firebase took too long to respond. Check your connection and try again.';
+      errorMessage = 'Firebase took too long to respond. Check your connection and try again.';
 
       return false;
     } on FirebaseAuthException catch (error) {
@@ -190,7 +171,7 @@ class AuthProvider extends ChangeNotifier {
       errorMessage = 'Something went wrong. Please try again.';
       return false;
     } finally {
-      // always stopping the loading indicator
+      // stopping the loading sign after the operation
       changeLoading(false);
     }
   }

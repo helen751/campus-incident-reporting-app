@@ -83,8 +83,7 @@ class _SignUpPageState extends State<SignUpPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            authProvider.errorMessage ??
-                'Unable to create your account.',
+            authProvider.errorMessage ?? 'Unable to create your account.',
           ),
           backgroundColor: Colors.red,
         ),
@@ -140,12 +139,9 @@ class _SignUpPageState extends State<SignUpPage> {
                       onPressed: authProvider.isLoading
                           ? null
                           : () {
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: navy,
-                      ),
+                              Navigator.pop(context);
+                            },
+                      icon: const Icon(Icons.arrow_back, color: navy),
                     ),
                   ),
 
@@ -181,10 +177,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     children: [
                       Text(
                         'Join us in keeping the campus safe',
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.black54, fontSize: 14),
                       ),
                       SizedBox(width: 6),
                       Icon(
@@ -194,10 +187,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       Text(
                         '!',
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.black54, fontSize: 14),
                       ),
                     ],
                   ),
@@ -238,16 +228,14 @@ class _SignUpPageState extends State<SignUpPage> {
                           // entering the full name
                           TextFormField(
                             controller: nameController,
-                            textCapitalization:
-                            TextCapitalization.words,
+                            textCapitalization: TextCapitalization.words,
                             textInputAction: TextInputAction.next,
                             decoration: formDecoration(
                               label: 'Full name',
                               icon: Icons.person_outline,
                             ),
                             validator: (value) {
-                              if (value == null ||
-                                  value.trim().isEmpty) {
+                              if (value == null || value.trim().isEmpty) {
                                 return 'Enter your full name.';
                               }
 
@@ -281,12 +269,12 @@ class _SignUpPageState extends State<SignUpPage> {
                             onChanged: authProvider.isLoading
                                 ? null
                                 : (value) {
-                              if (value != null) {
-                                setState(() {
-                                  selectedRole = value;
-                                });
-                              }
-                            },
+                                    if (value != null) {
+                                      setState(() {
+                                        selectedRole = value;
+                                      });
+                                    }
+                                  },
                           ),
 
                           const SizedBox(height: 16),
@@ -294,26 +282,25 @@ class _SignUpPageState extends State<SignUpPage> {
                           // entering only the email username
                           TextFormField(
                             controller: emailUsernameController,
-                            keyboardType:
-                            TextInputType.emailAddress,
+                            keyboardType: TextInputType.emailAddress,
                             textInputAction: TextInputAction.next,
                             autocorrect: false,
-                            decoration: formDecoration(
-                              label: 'Email username',
-                              icon: Icons.email_outlined,
-                            ).copyWith(
-                              hintText: selectedRole == 'Student'
-                                  ? 'firstname.lastname'
-                                  : 'staff.username',
-                              suffixText: emailDomain,
-                              suffixStyle: const TextStyle(
-                                color: navy,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                            decoration:
+                                formDecoration(
+                                  label: 'Email username',
+                                  icon: Icons.email_outlined,
+                                ).copyWith(
+                                  hintText: selectedRole == 'Student'
+                                      ? 'firstname.lastname'
+                                      : 'staff.username',
+                                  suffixText: emailDomain,
+                                  suffixStyle: const TextStyle(
+                                    color: navy,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                             validator: (value) {
-                              final username =
-                                  value?.trim() ?? '';
+                              final username = value?.trim() ?? '';
 
                               if (username.isEmpty) {
                                 return 'Enter your email username.';
@@ -331,8 +318,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 r'^[a-zA-Z0-9._-]+$',
                               );
 
-                              if (!validUsername
-                                  .hasMatch(username)) {
+                              if (!validUsername.hasMatch(username)) {
                                 return 'Enter a valid email username.';
                               }
 
@@ -344,11 +330,9 @@ class _SignUpPageState extends State<SignUpPage> {
 
                           // showing the complete email address
                           ValueListenableBuilder<TextEditingValue>(
-                            valueListenable:
-                            emailUsernameController,
+                            valueListenable: emailUsernameController,
                             builder: (context, value, child) {
-                              final username =
-                              value.text.trim();
+                              final username = value.text.trim();
 
                               if (username.isEmpty) {
                                 return const SizedBox();
@@ -372,29 +356,26 @@ class _SignUpPageState extends State<SignUpPage> {
                             controller: passwordController,
                             obscureText: hidePassword,
                             textInputAction: TextInputAction.next,
-                            decoration: formDecoration(
-                              label: 'Password',
-                              icon: Icons.lock_outline,
-                            ).copyWith(
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    hidePassword =
-                                    !hidePassword;
-                                  });
-                                },
-                                icon: Icon(
-                                  hidePassword
-                                      ? Icons
-                                      .visibility_off_outlined
-                                      : Icons
-                                      .visibility_outlined,
+                            decoration:
+                                formDecoration(
+                                  label: 'Password',
+                                  icon: Icons.lock_outline,
+                                ).copyWith(
+                                  suffixIcon: IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        hidePassword = !hidePassword;
+                                      });
+                                    },
+                                    icon: Icon(
+                                      hidePassword
+                                          ? Icons.visibility_off_outlined
+                                          : Icons.visibility_outlined,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
                             validator: (value) {
-                              if (value == null ||
-                                  value.isEmpty) {
+                              if (value == null || value.isEmpty) {
                                 return 'Enter a password.';
                               }
 
@@ -410,8 +391,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
                           // confirming the password
                           TextFormField(
-                            controller:
-                            confirmPasswordController,
+                            controller: confirmPasswordController,
                             obscureText: hideConfirmPassword,
                             textInputAction: TextInputAction.done,
                             onFieldSubmitted: (_) {
@@ -419,34 +399,31 @@ class _SignUpPageState extends State<SignUpPage> {
                                 createAccount();
                               }
                             },
-                            decoration: formDecoration(
-                              label: 'Confirm password',
-                              icon: Icons.lock_outline,
-                            ).copyWith(
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    hideConfirmPassword =
-                                    !hideConfirmPassword;
-                                  });
-                                },
-                                icon: Icon(
-                                  hideConfirmPassword
-                                      ? Icons
-                                      .visibility_off_outlined
-                                      : Icons
-                                      .visibility_outlined,
+                            decoration:
+                                formDecoration(
+                                  label: 'Confirm password',
+                                  icon: Icons.lock_outline,
+                                ).copyWith(
+                                  suffixIcon: IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        hideConfirmPassword =
+                                            !hideConfirmPassword;
+                                      });
+                                    },
+                                    icon: Icon(
+                                      hideConfirmPassword
+                                          ? Icons.visibility_off_outlined
+                                          : Icons.visibility_outlined,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
                             validator: (value) {
-                              if (value == null ||
-                                  value.isEmpty) {
+                              if (value == null || value.isEmpty) {
                                 return 'Confirm your password.';
                               }
 
-                              if (value !=
-                                  passwordController.text) {
+                              if (value != passwordController.text) {
                                 return 'The passwords do not match.';
                               }
 
@@ -467,46 +444,40 @@ class _SignUpPageState extends State<SignUpPage> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: coral,
                                 foregroundColor: Colors.white,
-                                disabledBackgroundColor:
-                                coral.withValues(alpha: 0.55),
+                                disabledBackgroundColor: coral.withValues(
+                                  alpha: 0.55,
+                                ),
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                  BorderRadius.circular(14),
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
                               ),
                               child: authProvider.isLoading
                                   ? const SizedBox(
-                                width: 23,
-                                height: 23,
-                                child:
-                                CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2.5,
-                                ),
-                              )
+                                      width: 23,
+                                      height: 23,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2.5,
+                                      ),
+                                    )
                                   : const Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.person_add_alt_1,
-                                    size: 20,
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Create Account',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight:
-                                      FontWeight.bold,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.person_add_alt_1, size: 20),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Create Account',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                ],
-                              ),
                             ),
                           ),
-
                         ],
                       ),
                     ),
@@ -526,8 +497,8 @@ class _SignUpPageState extends State<SignUpPage> {
                         onPressed: authProvider.isLoading
                             ? null
                             : () {
-                          Navigator.pop(context);
-                        },
+                                Navigator.pop(context);
+                              },
                         child: const Text(
                           'Sign In',
                           style: TextStyle(
@@ -544,18 +515,11 @@ class _SignUpPageState extends State<SignUpPage> {
                   const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.verified_user_outlined,
-                        color: mint,
-                        size: 17,
-                      ),
+                      Icon(Icons.verified_user_outlined, color: mint, size: 17),
                       SizedBox(width: 6),
                       Text(
                         'Only verified ALU accounts can register.',
-                        style: TextStyle(
-                          color: Colors.black45,
-                          fontSize: 12,
-                        ),
+                        style: TextStyle(color: Colors.black45, fontSize: 12),
                       ),
                     ],
                   ),
@@ -584,29 +548,19 @@ class _SignUpPageState extends State<SignUpPage> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(
-          color: Color(0xFFE3E8EF),
-        ),
+        borderSide: const BorderSide(color: Color(0xFFE3E8EF)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(
-          color: coral,
-          width: 1.5,
-        ),
+        borderSide: const BorderSide(color: coral, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(
-          color: Colors.red,
-        ),
+        borderSide: const BorderSide(color: Colors.red),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(
-          color: Colors.red,
-          width: 1.5,
-        ),
+        borderSide: const BorderSide(color: Colors.red, width: 1.5),
       ),
     );
   }

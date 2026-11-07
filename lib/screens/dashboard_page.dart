@@ -1,19 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'updates_page.dart';
-import 'report_page.dart';
-import 'your_fires_page.dart';
-import 'profile_page.dart';
 import '../widgets/notification_bell.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'admin_home_dashboard.dart';
+import 'profile_page.dart';
+import 'report_page.dart';
+import 'updates_page.dart';
+import 'your_fires_page.dart';
 
 class DashboardPage extends StatefulWidget {
-  const DashboardPage({
-    super.key,
-    this.isAdmin = false,
-  });
+  const DashboardPage({super.key, this.isAdmin = false});
 
   final bool isAdmin;
 
@@ -40,13 +37,11 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     final List<Widget> pages = [
       widget.isAdmin
-          ? AdminHomeDashboard(
-        onReviewPressed: () => changePage(1),
-      )
+          ? AdminHomeDashboard(onReviewPressed: () => changePage(1))
           : HomeDashboard(
-        onReportPressed: () => changePage(2),
-        onUpdatesPressed: () => changePage(1),
-      ),
+              onReportPressed: () => changePage(2),
+              onUpdatesPressed: () => changePage(1),
+            ),
       const UpdatesPage(),
       const ReportPage(),
       const YourFiresPage(),
@@ -66,10 +61,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
             // showing the selected page
             Expanded(
-              child: IndexedStack(
-                index: selectedIndex,
-                children: pages,
-              ),
+              child: IndexedStack(index: selectedIndex, children: pages),
             ),
           ],
         ),
@@ -98,10 +90,7 @@ class DashboardTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 74,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 8,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       color: Colors.white,
       child: Row(
         children: [
@@ -124,9 +113,7 @@ class DashboardTopBar extends StatelessWidget {
           const Spacer(),
 
           // opening the updates page
-          NotificationBell(
-            onPressed: onNotificationPressed,
-          ),
+          NotificationBell(onPressed: onNotificationPressed),
 
           const SizedBox(width: 10),
 
@@ -136,10 +123,7 @@ class DashboardTopBar extends StatelessWidget {
             child: const CircleAvatar(
               radius: 22,
               backgroundColor: _DashboardPageState.navy,
-              child: Icon(
-                Icons.person_outline,
-                color: Colors.white,
-              ),
+              child: Icon(Icons.person_outline, color: Colors.white),
             ),
           ),
         ],
@@ -149,10 +133,7 @@ class DashboardTopBar extends StatelessWidget {
 }
 
 class LatestIncidentCard extends StatelessWidget {
-  const LatestIncidentCard({
-    super.key,
-    required this.onPressed,
-  });
+  const LatestIncidentCard({super.key, required this.onPressed});
 
   final VoidCallback onPressed;
 
@@ -222,24 +203,20 @@ class LatestIncidentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<
-        QuerySnapshot<Map<String, dynamic>>>(
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
       stream: FirebaseFirestore.instance
           .collection('incidents')
           .orderBy('createdAt', descending: true)
           .limit(1)
           .snapshots(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState ==
-            ConnectionState.waiting) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return Container(
             height: 145,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: const Color(0xFFE5EAF0),
-              ),
+              border: Border.all(color: const Color(0xFFE5EAF0)),
             ),
             alignment: Alignment.center,
             child: const CircularProgressIndicator(
@@ -273,20 +250,13 @@ class LatestIncidentCard extends StatelessWidget {
 
         final incident = documents.first.data();
 
-        final title =
-            incident['title']?.toString() ??
-                'Campus incident';
+        final title = incident['title']?.toString() ?? 'Campus incident';
 
-        final status =
-            incident['status']?.toString() ??
-                'Submitted';
+        final status = incident['status']?.toString() ?? 'Submitted';
 
-        final location =
-            incident['location']?.toString() ??
-                'ALU Campus';
+        final location = incident['location']?.toString() ?? 'ALU Campus';
 
-        final imageUrl =
-            incident['imageUrl']?.toString() ?? '';
+        final imageUrl = incident['imageUrl']?.toString() ?? '';
 
         final color = statusColor(status);
 
@@ -301,12 +271,10 @@ class LatestIncidentCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(22),
-                border: Border.all(
-                  color: color.withOpacity(0.20),
-                ),
+                border: Border.all(color: color.withValues(alpha: 0.20)),
                 boxShadow: [
                   BoxShadow(
-                    color: navy.withOpacity(0.06),
+                    color: navy.withValues(alpha: 0.06),
                     blurRadius: 18,
                     offset: const Offset(0, 7),
                   ),
@@ -317,37 +285,31 @@ class LatestIncidentCard extends StatelessWidget {
                   Row(
                     children: [
                       ClipRRect(
-                        borderRadius:
-                        BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(15),
                         child: imageUrl.isNotEmpty
                             ? Image.network(
-                          imageUrl,
-                          width: 72,
-                          height: 72,
-                          fit: BoxFit.cover,
-                          errorBuilder: (
-                              context,
-                              error,
-                              stackTrace,
-                              ) {
-                            return _LatestStatusIcon(
-                              color: color,
-                              icon: statusIcon(status),
-                            );
-                          },
-                        )
+                                imageUrl,
+                                width: 72,
+                                height: 72,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return _LatestStatusIcon(
+                                    color: color,
+                                    icon: statusIcon(status),
+                                  );
+                                },
+                              )
                             : _LatestStatusIcon(
-                          color: color,
-                          icon: statusIcon(status),
-                        ),
+                                color: color,
+                                icon: statusIcon(status),
+                              ),
                       ),
 
                       const SizedBox(width: 13),
 
                       Expanded(
                         child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
@@ -355,13 +317,11 @@ class LatestIncidentCard extends StatelessWidget {
                                   child: Text(
                                     title,
                                     maxLines: 1,
-                                    overflow:
-                                    TextOverflow.ellipsis,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       color: navy,
                                       fontSize: 15,
-                                      fontWeight:
-                                      FontWeight.bold,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
@@ -369,16 +329,13 @@ class LatestIncidentCard extends StatelessWidget {
                                 const SizedBox(width: 8),
 
                                 Container(
-                                  padding:
-                                  const EdgeInsets.symmetric(
+                                  padding: const EdgeInsets.symmetric(
                                     horizontal: 8,
                                     vertical: 5,
                                   ),
                                   decoration: BoxDecoration(
-                                    color:
-                                    color.withOpacity(0.11),
-                                    borderRadius:
-                                    BorderRadius.circular(15),
+                                    color: color.withValues(alpha: 0.11),
+                                    borderRadius: BorderRadius.circular(15),
                                   ),
                                   child: Row(
                                     children: [
@@ -393,8 +350,7 @@ class LatestIncidentCard extends StatelessWidget {
                                         style: TextStyle(
                                           color: color,
                                           fontSize: 9,
-                                          fontWeight:
-                                          FontWeight.bold,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                     ],
@@ -417,8 +373,7 @@ class LatestIncidentCard extends StatelessWidget {
                                   child: Text(
                                     location,
                                     maxLines: 1,
-                                    overflow:
-                                    TextOverflow.ellipsis,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       color: Colors.black54,
                                       fontSize: 11,
@@ -443,19 +398,14 @@ class LatestIncidentCard extends StatelessWidget {
 
                       const SizedBox(width: 5),
 
-                      const Icon(
-                        Icons.chevron_right,
-                        color: Colors.black38,
-                      ),
+                      const Icon(Icons.chevron_right, color: Colors.black38),
                     ],
                   ),
 
                   const SizedBox(height: 15),
 
                   // showing the current progress
-                  DashboardIncidentProgress(
-                    currentStatus: status,
-                  ),
+                  DashboardIncidentProgress(currentStatus: status),
                 ],
               ),
             ),
@@ -467,10 +417,7 @@ class LatestIncidentCard extends StatelessWidget {
 }
 
 class DashboardIncidentProgress extends StatelessWidget {
-  const DashboardIncidentProgress({
-    super.key,
-    required this.currentStatus,
-  });
+  const DashboardIncidentProgress({super.key, required this.currentStatus});
 
   final String currentStatus;
 
@@ -486,9 +433,7 @@ class DashboardIncidentProgress extends StatelessWidget {
 
   int get currentIndex {
     final index = stages.indexWhere(
-          (stage) =>
-      stage.toLowerCase() ==
-          currentStatus.toLowerCase(),
+      (stage) => stage.toLowerCase() == currentStatus.toLowerCase(),
     );
 
     return index < 0 ? 0 : index;
@@ -497,66 +442,51 @@ class DashboardIncidentProgress extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: List.generate(
-        stages.length,
-            (index) {
-          final completed = index <= currentIndex;
-          final isLast = index == stages.length - 1;
+      children: List.generate(stages.length, (index) {
+        final completed = index <= currentIndex;
+        final isLast = index == stages.length - 1;
 
-          return Expanded(
-            flex: isLast ? 0 : 1,
-            child: Row(
-              children: [
-                AnimatedContainer(
-                  duration:
-                  const Duration(milliseconds: 400),
-                  width: 22,
-                  height: 22,
-                  decoration: BoxDecoration(
-                    color:
-                    completed ? coral : Colors.white,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: completed
-                          ? coral
-                          : const Color(0xFFD4DEE8),
-                      width: 2,
-                    ),
+        return Expanded(
+          flex: isLast ? 0 : 1,
+          child: Row(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 400),
+                width: 22,
+                height: 22,
+                decoration: BoxDecoration(
+                  color: completed ? coral : Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: completed ? coral : const Color(0xFFD4DEE8),
+                    width: 2,
                   ),
-                  child: completed
-                      ? const Icon(
-                    Icons.check,
-                    color: Colors.white,
-                    size: 13,
-                  )
-                      : null,
                 ),
+                child: completed
+                    ? const Icon(Icons.check, color: Colors.white, size: 13)
+                    : null,
+              ),
 
-                if (!isLast)
-                  Expanded(
-                    child: AnimatedContainer(
-                      duration:
-                      const Duration(milliseconds: 400),
-                      height: 3,
-                      color: index < currentIndex
-                          ? coral
-                          : const Color(0xFFD4DEE8),
-                    ),
+              if (!isLast)
+                Expanded(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 400),
+                    height: 3,
+                    color: index < currentIndex
+                        ? coral
+                        : const Color(0xFFD4DEE8),
                   ),
-              ],
-            ),
-          );
-        },
-      ),
+                ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }
 
 class _LatestStatusIcon extends StatelessWidget {
-  const _LatestStatusIcon({
-    required this.color,
-    required this.icon,
-  });
+  const _LatestStatusIcon({required this.color, required this.icon});
 
   final Color color;
   final IconData icon;
@@ -566,12 +496,8 @@ class _LatestStatusIcon extends StatelessWidget {
     return Container(
       width: 72,
       height: 72,
-      color: color.withOpacity(0.10),
-      child: Icon(
-        icon,
-        color: color,
-        size: 30,
-      ),
+      color: color.withValues(alpha: 0.10),
+      child: Icon(icon, color: color, size: 30),
     );
   }
 }
@@ -604,28 +530,21 @@ class _LatestUpdateMessage extends StatelessWidget {
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: const Color(0xFFE5EAF0),
-            ),
+            border: Border.all(color: const Color(0xFFE5EAF0)),
           ),
           child: Row(
             children: [
               CircleAvatar(
                 radius: 24,
-                backgroundColor:
-                iconColor.withOpacity(0.10),
-                child: Icon(
-                  icon,
-                  color: iconColor,
-                ),
+                backgroundColor: iconColor.withValues(alpha: 0.10),
+                child: Icon(icon, color: iconColor),
               ),
 
               const SizedBox(width: 14),
 
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
@@ -647,10 +566,7 @@ class _LatestUpdateMessage extends StatelessWidget {
                 ),
               ),
 
-              const Icon(
-                Icons.chevron_right,
-                color: Colors.black38,
-              ),
+              const Icon(Icons.chevron_right, color: Colors.black38),
             ],
           ),
         ),
@@ -697,18 +613,13 @@ class HomeDashboard extends StatelessWidget {
 
           const Text(
             'Help us keep the ALU campus safe.',
-            style: TextStyle(
-              color: Colors.black54,
-              fontSize: 14,
-            ),
+            style: TextStyle(color: Colors.black54, fontSize: 14),
           ),
 
           const SizedBox(height: 20),
 
           // showing the main campus banner
-          CampusHero(
-            onReportPressed: onReportPressed,
-          ),
+          CampusHero(onReportPressed: onReportPressed),
 
           const SizedBox(height: 26),
 
@@ -781,9 +692,7 @@ class HomeDashboard extends StatelessWidget {
           const SizedBox(height: 10),
 
           // showing the latest incident from Firestore
-          LatestIncidentCard(
-            onPressed: onUpdatesPressed,
-          ),
+          LatestIncidentCard(onPressed: onUpdatesPressed),
 
           const SizedBox(height: 22),
 
@@ -800,10 +709,7 @@ class HomeDashboard extends StatelessWidget {
                 CircleAvatar(
                   radius: 24,
                   backgroundColor: Colors.white12,
-                  child: Icon(
-                    Icons.local_phone_outlined,
-                    color: Colors.white,
-                  ),
+                  child: Icon(Icons.local_phone_outlined, color: Colors.white),
                 ),
 
                 SizedBox(width: 14),
@@ -844,17 +750,13 @@ class HomeDashboard extends StatelessWidget {
 class CampusHero extends StatefulWidget {
   final VoidCallback onReportPressed;
 
-  const CampusHero({
-    super.key,
-    required this.onReportPressed,
-  });
+  const CampusHero({super.key, required this.onReportPressed});
 
   @override
   State<CampusHero> createState() => _CampusHeroState();
 }
 
-class _CampusHeroState extends State<CampusHero>
-    with TickerProviderStateMixin {
+class _CampusHeroState extends State<CampusHero> with TickerProviderStateMixin {
   late AnimationController animationController;
   late AnimationController personFloatController;
 
@@ -875,27 +777,17 @@ class _CampusHeroState extends State<CampusHero>
     // fading the hero text into the screen
     textFade = CurvedAnimation(
       parent: animationController,
-      curve: const Interval(
-        0.0,
-        0.65,
-        curve: Curves.easeIn,
-      ),
+      curve: const Interval(0.0, 0.65, curve: Curves.easeIn),
     );
 
     // sliding the person into the screen
-    personSlide = Tween<Offset>(
-      begin: const Offset(0.65, 0),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: animationController,
-        curve: const Interval(
-          0.15,
-          1.0,
-          curve: Curves.easeOutBack,
-        ),
-      ),
-    );
+    personSlide = Tween<Offset>(begin: const Offset(0.65, 0), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: animationController,
+            curve: const Interval(0.15, 1.0, curve: Curves.easeOutBack),
+          ),
+        );
 
     // controlling the person's floating movement
     personFloatController = AnimationController(
@@ -903,24 +795,17 @@ class _CampusHeroState extends State<CampusHero>
       vsync: this,
     );
 
-// moving the person gently up and down
-    personFloat = Tween<double>(
-      begin: -5,
-      end: 5,
-    ).animate(
-      CurvedAnimation(
-        parent: personFloatController,
-        curve: Curves.easeInOut,
-      ),
+    // moving the person gently up and down
+    personFloat = Tween<double>(begin: -5, end: 5).animate(
+      CurvedAnimation(parent: personFloatController, curve: Curves.easeInOut),
     );
 
-// starting the floating movement after the entrance
+    // starting the floating movement after the entrance
     animationController.forward().then((_) {
       if (mounted) {
         personFloatController.repeat(reverse: true);
       }
     });
-
   }
 
   @override
@@ -945,9 +830,7 @@ class _CampusHeroState extends State<CampusHero>
                 'assets/images/alu_campus.jpeg',
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: _DashboardPageState.navy,
-                  );
+                  return Container(color: _DashboardPageState.navy);
                 },
               ),
             ),
@@ -960,12 +843,9 @@ class _CampusHeroState extends State<CampusHero>
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                     colors: [
-                      _DashboardPageState.navy
-                          .withValues(alpha: 0.98),
-                      _DashboardPageState.navy
-                          .withValues(alpha: 0.78),
-                      _DashboardPageState.navy
-                          .withValues(alpha: 0.18),
+                      _DashboardPageState.navy.withValues(alpha: 0.98),
+                      _DashboardPageState.navy.withValues(alpha: 0.78),
+                      _DashboardPageState.navy.withValues(alpha: 0.18),
                     ],
                   ),
                 ),
@@ -1014,7 +894,7 @@ class _CampusHeroState extends State<CampusHero>
             Positioned(
               top: 78,
               left: 24,
-              right: 145,
+              right: 120,
               child: FadeTransition(
                 opacity: textFade,
                 child: const Column(
@@ -1063,15 +943,10 @@ class _CampusHeroState extends State<CampusHero>
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  icon: const Icon(
-                    Icons.add_alert_outlined,
-                    size: 20,
-                  ),
+                  icon: const Icon(Icons.add_alert_outlined, size: 20),
                   label: const Text(
                     'Report a Fire',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -1139,13 +1014,10 @@ class QuickAccessCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: const Color(0xFFE5EAF0),
-            ),
+            border: Border.all(color: const Color(0xFFE5EAF0)),
             boxShadow: [
               BoxShadow(
-                color: _DashboardPageState.navy
-                    .withValues(alpha: 0.04),
+                color: _DashboardPageState.navy.withValues(alpha: 0.04),
                 blurRadius: 12,
                 offset: const Offset(0, 5),
               ),
@@ -1157,11 +1029,7 @@ class QuickAccessCard extends StatelessWidget {
               CircleAvatar(
                 radius: 21,
                 backgroundColor: color.withValues(alpha: 0.12),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 22,
-                ),
+                child: Icon(icon, color: color, size: 22),
               ),
 
               const SizedBox(height: 14),
@@ -1179,10 +1047,7 @@ class QuickAccessCard extends StatelessWidget {
 
               Text(
                 subtitle,
-                style: const TextStyle(
-                  color: Colors.black54,
-                  fontSize: 11,
-                ),
+                style: const TextStyle(color: Colors.black54, fontSize: 11),
               ),
             ],
           ),
@@ -1203,8 +1068,7 @@ class DashboardNavigation extends StatefulWidget {
   });
 
   @override
-  State<DashboardNavigation> createState() =>
-      _DashboardNavigationState();
+  State<DashboardNavigation> createState() => _DashboardNavigationState();
 }
 
 class _DashboardNavigationState extends State<DashboardNavigation>
@@ -1223,14 +1087,8 @@ class _DashboardNavigationState extends State<DashboardNavigation>
     );
 
     // growing the report button slightly
-    reportPulse = Tween<double>(
-      begin: 1.0,
-      end: 1.10,
-    ).animate(
-      CurvedAnimation(
-        parent: pulseController,
-        curve: Curves.easeInOut,
-      ),
+    reportPulse = Tween<double>(begin: 1.0, end: 1.10).animate(
+      CurvedAnimation(parent: pulseController, curve: Curves.easeInOut),
     );
 
     // repeating the pulse animation
@@ -1292,30 +1150,23 @@ class _DashboardNavigationState extends State<DashboardNavigation>
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: _DashboardPageState.coral
-                            .withValues(alpha: 0.30),
+                        color: _DashboardPageState.coral.withValues(
+                          alpha: 0.30,
+                        ),
                         blurRadius: 12,
                         spreadRadius: 2,
                       ),
                     ],
                   ),
-                  child: const Icon(
-                    Icons.add,
-                    color: Colors.white,
-                    size: 29,
-                  ),
+                  child: const Icon(Icons.add, color: Colors.white, size: 29),
                 ),
               ),
               label: 'Report',
             ),
 
             const BottomNavigationBarItem(
-              icon: Icon(
-                Icons.local_fire_department_outlined,
-              ),
-              activeIcon: Icon(
-                Icons.local_fire_department,
-              ),
+              icon: Icon(Icons.local_fire_department_outlined),
+              activeIcon: Icon(Icons.local_fire_department),
               label: 'Your Fires',
             ),
 

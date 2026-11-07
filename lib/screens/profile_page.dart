@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart'
-    show FirebaseAuth;
+import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -29,26 +28,17 @@ class ProfilePage extends StatelessWidget {
           icon: const CircleAvatar(
             radius: 28,
             backgroundColor: Color(0xFFFFE8E2),
-            child: Icon(
-              Icons.logout,
-              color: coral,
-            ),
+            child: Icon(Icons.logout, color: coral),
           ),
           title: const Text(
             'Log out?',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: navy,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(color: navy, fontWeight: FontWeight.bold),
           ),
           content: const Text(
             'You will need to sign in again to access CampusFire.',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.black54,
-              height: 1.4,
-            ),
+            style: TextStyle(color: Colors.black54, height: 1.4),
           ),
           actionsAlignment: MainAxisAlignment.center,
           actions: [
@@ -58,9 +48,7 @@ class ProfilePage extends StatelessWidget {
               },
               style: OutlinedButton.styleFrom(
                 foregroundColor: navy,
-                side: const BorderSide(
-                  color: Color(0xFFD8E0E8),
-                ),
+                side: const BorderSide(color: Color(0xFFD8E0E8)),
               ),
               child: const Text('Cancel'),
             ),
@@ -91,11 +79,7 @@ class ProfilePage extends StatelessWidget {
     final authProvider = context.watch<AuthProvider>();
 
     if (currentUser == null) {
-      return const Center(
-        child: CircularProgressIndicator(
-          color: coral,
-        ),
-      );
+      return const Center(child: CircularProgressIndicator(color: coral));
     }
 
     return Container(
@@ -110,31 +94,22 @@ class ProfilePage extends StatelessWidget {
 
           final fullName =
               userData?['fullName'] as String? ??
-                  currentUser.displayName ??
-                  'CampusFire User';
+              currentUser.displayName ??
+              'CampusFire User';
 
           final email =
-              userData?['email'] as String? ??
-                  currentUser.email ??
-                  '';
+              userData?['email'] as String? ?? currentUser.email ?? '';
 
-          final role =
-              userData?['role'] as String? ?? 'Student';
+          final role = userData?['role'] as String? ?? 'Student';
 
-          final status =
-              userData?['status'] as String? ?? 'active';
+          final status = userData?['status'] as String? ?? 'active';
 
           final firstLetter = fullName.isNotEmpty
               ? fullName[0].toUpperCase()
               : 'U';
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(
-              20,
-              24,
-              20,
-              35,
-            ),
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 35),
             child: Column(
               children: [
                 const Text(
@@ -150,10 +125,7 @@ class ProfilePage extends StatelessWidget {
 
                 const Text(
                   'Manage your CampusFire account.',
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.black54, fontSize: 14),
                 ),
 
                 const SizedBox(height: 26),
@@ -177,8 +149,7 @@ class ProfilePage extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 47,
-                        backgroundColor:
-                        navy.withValues(alpha: 0.10),
+                        backgroundColor: navy.withValues(alpha: 0.10),
                         child: Text(
                           firstLetter,
                           style: const TextStyle(
@@ -245,9 +216,7 @@ class ProfilePage extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: const Color(0xFFE5EAF0),
-                    ),
+                    border: Border.all(color: const Color(0xFFE5EAF0)),
                   ),
                   child: Column(
                     children: [
@@ -290,34 +259,28 @@ class ProfilePage extends StatelessWidget {
                     onPressed: authProvider.isLoading
                         ? null
                         : () {
-                      logout(context);
-                    },
+                            logout(context);
+                          },
                     style: OutlinedButton.styleFrom(
                       foregroundColor: coral,
-                      side: const BorderSide(
-                        color: coral,
-                      ),
+                      side: const BorderSide(color: coral),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
                     ),
                     icon: authProvider.isLoading
                         ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        color: coral,
-                        strokeWidth: 2,
-                      ),
-                    )
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: coral,
+                              strokeWidth: 2,
+                            ),
+                          )
                         : const Icon(Icons.logout),
                     label: Text(
-                      authProvider.isLoading
-                          ? 'Logging out...'
-                          : 'Log Out',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      authProvider.isLoading ? 'Logging out...' : 'Log Out',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -348,13 +311,8 @@ class ProfileInformation extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 21,
-          backgroundColor:
-          ProfilePage.navy.withValues(alpha: 0.08),
-          child: Icon(
-            icon,
-            color: ProfilePage.navy,
-            size: 21,
-          ),
+          backgroundColor: ProfilePage.navy.withValues(alpha: 0.08),
+          child: Icon(icon, color: ProfilePage.navy, size: 21),
         ),
 
         const SizedBox(width: 13),
@@ -365,10 +323,7 @@ class ProfileInformation extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
-                  color: Colors.black45,
-                  fontSize: 11,
-                ),
+                style: const TextStyle(color: Colors.black45, fontSize: 11),
               ),
               const SizedBox(height: 3),
               Text(

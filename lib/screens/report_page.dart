@@ -61,9 +61,7 @@ class _ReportPageState extends State<ReportPage> {
       context: context,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(24),
-        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (context) {
         return SafeArea(
@@ -150,10 +148,7 @@ class _ReportPageState extends State<ReportPage> {
     } catch (error) {
       if (!mounted) return;
 
-      showMessage(
-        'We could not open the selected image.',
-        Colors.red,
-      );
+      showMessage('We could not open the selected image.', Colors.red);
     }
   }
 
@@ -170,36 +165,25 @@ class _ReportPageState extends State<ReportPage> {
       'https://api.cloudinary.com/v1_1/$cloudName/image/upload',
     );
 
-    final request = http.MultipartRequest(
-      'POST',
-      uploadUrl,
-    );
+    final request = http.MultipartRequest('POST', uploadUrl);
 
     request.fields['upload_preset'] = uploadPreset;
     request.fields['folder'] = 'campusfire/incidents';
 
-    request.files.add(
-      await http.MultipartFile.fromPath(
-        'file',
-        image.path,
-      ),
+    request.files.add(await http.MultipartFile.fromPath('file', image.path));
+
+    final streamedResponse = await request.send().timeout(
+      const Duration(seconds: 40),
     );
 
-    final streamedResponse = await request
-        .send()
-        .timeout(const Duration(seconds: 40));
-
-    final response = await http.Response.fromStream(
-      streamedResponse,
-    );
+    final response = await http.Response.fromStream(streamedResponse);
 
     final responseData = jsonDecode(response.body);
 
-    if (response.statusCode != 200 &&
-        response.statusCode != 201) {
+    if (response.statusCode != 200 && response.statusCode != 201) {
       final message =
           responseData['error']?['message'] ??
-              'The photograph could not be uploaded.';
+          'The photograph could not be uploaded.';
 
       throw Exception(message);
     }
@@ -238,19 +222,15 @@ class _ReportPageState extends State<ReportPage> {
 
       // uploading the selected photograph
       if (selectedImage != null) {
-        final imageResult = await uploadImage(
-          selectedImage!,
-        );
+        final imageResult = await uploadImage(selectedImage!);
 
         imageUrl = imageResult['imageUrl'] ?? '';
         imagePublicId = imageResult['publicId'] ?? '';
       }
 
       final firestore = FirebaseFirestore.instance;
-      final incidentReference =
-      firestore.collection('incidents').doc();
-      final notificationReference =
-      firestore.collection('notifications').doc();
+      final incidentReference = firestore.collection('incidents').doc();
+      final notificationReference = firestore.collection('notifications').doc();
 
       final batch = firestore.batch();
 
@@ -276,16 +256,13 @@ class _ReportPageState extends State<ReportPage> {
         'userId': user.uid,
         'incidentId': incidentReference.id,
         'title': 'Report submitted',
-        'message':
-        '${titleController.text.trim()} was submitted successfully.',
+        'message': '${titleController.text.trim()} was submitted successfully.',
         'type': 'incident_submitted',
         'isRead': false,
         'createdAt': FieldValue.serverTimestamp(),
       });
 
-      await batch
-          .commit()
-          .timeout(const Duration(seconds: 25));
+      await batch.commit().timeout(const Duration(seconds: 25));
 
       if (!mounted) return;
 
@@ -315,10 +292,7 @@ class _ReportPageState extends State<ReportPage> {
 
       debugPrint('Report submission error: $error');
 
-      showMessage(
-        error.toString().replaceFirst('Exception: ', ''),
-        Colors.red,
-      );
+      showMessage(error.toString().replaceFirst('Exception: ', ''), Colors.red);
     } finally {
       if (mounted) {
         setState(() {
@@ -330,12 +304,8 @@ class _ReportPageState extends State<ReportPage> {
 
   // showing a message to the user
   void showMessage(String message, Color color) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: color,
-      ),
-    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message), backgroundColor: color));
   }
 
   @override
@@ -381,10 +351,7 @@ class _ReportPageState extends State<ReportPage> {
                 child: const Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.warning_amber_rounded,
-                      color: coral,
-                    ),
+                    Icon(Icons.warning_amber_rounded, color: coral),
                     SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -434,24 +401,20 @@ class _ReportPageState extends State<ReportPage> {
 
                     const SizedBox(height: 22),
 
-                    const FormLabel(
-                      title: 'Incident title',
-                    ),
+                    const FormLabel(title: 'Incident title'),
 
                     const SizedBox(height: 8),
 
                     TextFormField(
                       controller: titleController,
-                      textCapitalization:
-                      TextCapitalization.sentences,
+                      textCapitalization: TextCapitalization.sentences,
                       textInputAction: TextInputAction.next,
                       decoration: inputDecoration(
                         hint: 'Example: Smoke near the kitchen',
                         icon: Icons.title,
                       ),
                       validator: (value) {
-                        if (value == null ||
-                            value.trim().isEmpty) {
+                        if (value == null || value.trim().isEmpty) {
                           return 'Enter an incident title.';
                         }
 
@@ -465,9 +428,7 @@ class _ReportPageState extends State<ReportPage> {
 
                     const SizedBox(height: 18),
 
-                    const FormLabel(
-                      title: 'Category',
-                    ),
+                    const FormLabel(title: 'Category'),
 
                     const SizedBox(height: 8),
 
@@ -488,10 +449,10 @@ class _ReportPageState extends State<ReportPage> {
                       onChanged: isSubmitting
                           ? null
                           : (value) {
-                        setState(() {
-                          selectedCategory = value;
-                        });
-                      },
+                              setState(() {
+                                selectedCategory = value;
+                              });
+                            },
                       validator: (value) {
                         if (value == null) {
                           return 'Select an incident category.';
@@ -503,24 +464,20 @@ class _ReportPageState extends State<ReportPage> {
 
                     const SizedBox(height: 18),
 
-                    const FormLabel(
-                      title: 'Location',
-                    ),
+                    const FormLabel(title: 'Location'),
 
                     const SizedBox(height: 8),
 
                     TextFormField(
                       controller: locationController,
-                      textCapitalization:
-                      TextCapitalization.words,
+                      textCapitalization: TextCapitalization.words,
                       textInputAction: TextInputAction.next,
                       decoration: inputDecoration(
                         hint: 'Example: Learning Commons, Floor 2',
                         icon: Icons.location_on_outlined,
                       ),
                       validator: (value) {
-                        if (value == null ||
-                            value.trim().isEmpty) {
+                        if (value == null || value.trim().isEmpty) {
                           return 'Enter the incident location.';
                         }
 
@@ -530,28 +487,23 @@ class _ReportPageState extends State<ReportPage> {
 
                     const SizedBox(height: 18),
 
-                    const FormLabel(
-                      title: 'Description',
-                    ),
+                    const FormLabel(title: 'Description'),
 
                     const SizedBox(height: 8),
 
                     TextFormField(
                       controller: descriptionController,
-                      textCapitalization:
-                      TextCapitalization.sentences,
+                      textCapitalization: TextCapitalization.sentences,
                       minLines: 4,
                       maxLines: 7,
                       maxLength: 500,
                       decoration: inputDecoration(
-                        hint:
-                        'Describe what happened and what you observed.',
+                        hint: 'Describe what happened and what you observed.',
                         icon: Icons.notes_outlined,
                         alignIconTop: true,
                       ),
                       validator: (value) {
-                        if (value == null ||
-                            value.trim().isEmpty) {
+                        if (value == null || value.trim().isEmpty) {
                           return 'Describe the incident.';
                         }
 
@@ -569,13 +521,13 @@ class _ReportPageState extends State<ReportPage> {
                       width: double.infinity,
                       height: 54,
                       child: ElevatedButton(
-                        onPressed:
-                        isSubmitting ? null : submitReport,
+                        onPressed: isSubmitting ? null : submitReport,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: coral,
                           foregroundColor: Colors.white,
-                          disabledBackgroundColor:
-                          coral.withValues(alpha: 0.55),
+                          disabledBackgroundColor: coral.withValues(
+                            alpha: 0.55,
+                          ),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
@@ -583,45 +535,39 @@ class _ReportPageState extends State<ReportPage> {
                         ),
                         child: isSubmitting
                             ? const Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 22,
-                              height: 22,
-                              child:
-                              CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2.4,
-                              ),
-                            ),
-                            SizedBox(width: 12),
-                            Text(
-                              'Submitting report...',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        )
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 22,
+                                    height: 22,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2.4,
+                                    ),
+                                  ),
+                                  SizedBox(width: 12),
+                                  Text(
+                                    'Submitting report...',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              )
                             : const Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.send_outlined,
-                              size: 20,
-                            ),
-                            SizedBox(width: 9),
-                            Text(
-                              'Submit Report',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.send_outlined, size: 20),
+                                  SizedBox(width: 9),
+                                  Text(
+                                    'Submit Report',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
                       ),
                     ),
                   ],
@@ -642,45 +588,31 @@ class _ReportPageState extends State<ReportPage> {
     return InputDecoration(
       hintText: hint,
       prefixIcon: Padding(
-        padding: EdgeInsets.only(
-          bottom: alignIconTop ? 80 : 0,
-        ),
+        padding: EdgeInsets.only(bottom: alignIconTop ? 80 : 0),
         child: Icon(icon),
       ),
       filled: true,
       fillColor: background,
-      counterStyle: const TextStyle(
-        color: Colors.black45,
-      ),
+      counterStyle: const TextStyle(color: Colors.black45),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(
-          color: Color(0xFFE2E8EF),
-        ),
+        borderSide: const BorderSide(color: Color(0xFFE2E8EF)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(
-          color: coral,
-          width: 1.5,
-        ),
+        borderSide: const BorderSide(color: coral, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(
-          color: Colors.red,
-        ),
+        borderSide: const BorderSide(color: Colors.red),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(
-          color: Colors.red,
-          width: 1.5,
-        ),
+        borderSide: const BorderSide(color: Colors.red, width: 1.5),
       ),
     );
   }
@@ -690,11 +622,7 @@ class FormLabel extends StatelessWidget {
   final String title;
   final bool optional;
 
-  const FormLabel({
-    super.key,
-    required this.title,
-    this.optional = false,
-  });
+  const FormLabel({super.key, required this.title, this.optional = false});
 
   @override
   Widget build(BuildContext context) {
@@ -712,10 +640,7 @@ class FormLabel extends StatelessWidget {
           const SizedBox(width: 6),
           const Text(
             '(optional)',
-            style: TextStyle(
-              color: Colors.black45,
-              fontSize: 12,
-            ),
+            style: TextStyle(color: Colors.black45, fontSize: 12),
           ),
         ],
       ],
@@ -747,10 +672,7 @@ class IncidentImageFrame extends StatelessWidget {
           decoration: BoxDecoration(
             color: _ReportPageState.background,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: const Color(0xFFD5DDE6),
-              width: 1.4,
-            ),
+            border: Border.all(color: const Color(0xFFD5DDE6), width: 1.4),
           ),
           child: const Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -777,10 +699,7 @@ class IncidentImageFrame extends StatelessWidget {
               Text(
                 'Take a photo or choose one from your gallery',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.black45,
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: Colors.black45, fontSize: 12),
               ),
             ],
           ),
@@ -796,10 +715,7 @@ class IncidentImageFrame extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.file(
-              selectedImage!,
-              fit: BoxFit.cover,
-            ),
+            Image.file(selectedImage!, fit: BoxFit.cover),
 
             Positioned(
               top: 12,
@@ -834,11 +750,7 @@ class IncidentImageFrame extends StatelessWidget {
                 ),
                 child: const Row(
                   children: [
-                    Icon(
-                      Icons.check_circle,
-                      color: Colors.white,
-                      size: 16,
-                    ),
+                    Icon(Icons.check_circle, color: Colors.white, size: 16),
                     SizedBox(width: 6),
                     Text(
                       'Photo added',
@@ -879,20 +791,14 @@ class PhotoOption extends StatelessWidget {
       onTap: onPressed,
       borderRadius: BorderRadius.circular(18),
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          vertical: 22,
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 22),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.10),
           borderRadius: BorderRadius.circular(18),
         ),
         child: Column(
           children: [
-            Icon(
-              icon,
-              color: color,
-              size: 31,
-            ),
+            Icon(icon, color: color, size: 31),
             const SizedBox(height: 9),
             Text(
               title,
@@ -927,11 +833,7 @@ class PhotoActionButton extends StatelessWidget {
       shape: const CircleBorder(),
       child: IconButton(
         onPressed: onPressed,
-        icon: Icon(
-          icon,
-          color: color,
-          size: 20,
-        ),
+        icon: Icon(icon, color: color, size: 20),
       ),
     );
   }

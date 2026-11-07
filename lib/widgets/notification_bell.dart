@@ -4,20 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class NotificationBell extends StatefulWidget {
-  const NotificationBell({
-    super.key,
-    required this.onPressed,
-  });
+  const NotificationBell({super.key, required this.onPressed});
 
   final VoidCallback onPressed;
 
   @override
-  State<NotificationBell> createState() =>
-      _NotificationBellState();
+  State<NotificationBell> createState() => _NotificationBellState();
 }
 
-class _NotificationBellState
-    extends State<NotificationBell> {
+class _NotificationBellState extends State<NotificationBell> {
   static const Color navy = Color(0xFF12355B);
   static const Color coral = Color(0xFFFF5A3C);
 
@@ -33,8 +28,7 @@ class _NotificationBellState
       return;
     }
 
-    final notificationAdded =
-        currentCount > previousCount;
+    final notificationAdded = currentCount > previousCount;
 
     previousCount = currentCount;
 
@@ -47,8 +41,7 @@ class _NotificationBellState
       SystemSound.play(SystemSoundType.alert);
       HapticFeedback.mediumImpact();
 
-      final messenger =
-      ScaffoldMessenger.maybeOf(context);
+      final messenger = ScaffoldMessenger.maybeOf(context);
 
       messenger?.hideCurrentSnackBar();
 
@@ -56,16 +49,9 @@ class _NotificationBellState
         SnackBar(
           content: const Row(
             children: [
-              Icon(
-                Icons.notifications_active_rounded,
-                color: Colors.white,
-              ),
+              Icon(Icons.notifications_active_rounded, color: Colors.white),
               SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'You have a new CampusFire update.',
-                ),
-              ),
+              Expanded(child: Text('You have a new CampusFire update.')),
             ],
           ),
           backgroundColor: navy,
@@ -81,12 +67,8 @@ class _NotificationBellState
 
   // marking reports and notifications as read
   Future<void> markEverythingAsRead({
-    required List<
-        DocumentReference<Map<String, dynamic>>>
-    incidents,
-    required List<
-        DocumentReference<Map<String, dynamic>>>
-    notifications,
+    required List<DocumentReference<Map<String, dynamic>>> incidents,
+    required List<DocumentReference<Map<String, dynamic>>> notifications,
   }) async {
     final user = FirebaseAuth.instance.currentUser;
 
@@ -108,24 +90,18 @@ class _NotificationBellState
       // marking new incident reports as seen
       for (final incident in incidents) {
         batch.update(incident, {
-          'readBy': FieldValue.arrayUnion(
-            [user.uid],
-          ),
+          'readBy': FieldValue.arrayUnion([user.uid]),
         });
       }
 
       // marking personal status notifications as read
       for (final notification in notifications) {
-        batch.update(notification, {
-          'isRead': true,
-        });
+        batch.update(notification, {'isRead': true});
       }
 
       await batch.commit();
     } catch (error) {
-      debugPrint(
-        'Could not mark notifications as read: $error',
-      );
+      debugPrint('Could not mark notifications as read: $error');
     } finally {
       if (mounted) {
         setState(() {
@@ -146,54 +122,39 @@ class _NotificationBellState
     }
 
     // listening for new incident reports
-    return StreamBuilder<
-        QuerySnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance
-          .collection('incidents')
-          .snapshots(),
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance.collection('incidents').snapshots(),
       builder: (context, incidentSnapshot) {
-        final incidentDocuments =
-            incidentSnapshot.data?.docs ?? [];
+        final incidentDocuments = incidentSnapshot.data?.docs ?? [];
 
-        final unreadIncidents =
-        incidentDocuments.where((incident) {
+        final unreadIncidents = incidentDocuments.where((incident) {
           final data = incident.data();
 
-          final reporterId =
-              data['reportedBy']?.toString() ?? '';
+          final reporterId = data['reportedBy']?.toString() ?? '';
 
-          final readBy = List<String>.from(
-            data['readBy'] ?? [],
-          );
+          final readBy = List<String>.from(data['readBy'] ?? []);
 
           // not notifying users about their own reports
-          return reporterId != user.uid &&
-              !readBy.contains(user.uid);
+          return reporterId != user.uid && !readBy.contains(user.uid);
         }).toList();
 
         // listening for personal status notifications
-        return StreamBuilder<
-            QuerySnapshot<Map<String, dynamic>>>(
+        return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
           stream: FirebaseFirestore.instance
               .collection('notifications')
-              .where(
-            'userId',
-            isEqualTo: user.uid,
-          )
+              .where('userId', isEqualTo: user.uid)
               .snapshots(),
           builder: (context, notificationSnapshot) {
-            final notificationDocuments =
-                notificationSnapshot.data?.docs ?? [];
+            final notificationDocuments = notificationSnapshot.data?.docs ?? [];
 
-            final unreadNotifications =
-            notificationDocuments.where((notification) {
-              return notification.data()['isRead'] !=
-                  true;
+            final unreadNotifications = notificationDocuments.where((
+              notification,
+            ) {
+              return notification.data()['isRead'] != true;
             }).toList();
 
             final unreadCount =
-                unreadIncidents.length +
-                    unreadNotifications.length;
+                unreadIncidents.length + unreadNotifications.length;
 
             checkForNewNotification(unreadCount);
 
@@ -201,41 +162,32 @@ class _NotificationBellState
               onPressed: markingAsRead
                   ? null
                   : () {
-                markEverythingAsRead(
-                  incidents: unreadIncidents
-                      .map(
-                        (incident) =>
-                    incident.reference,
-                  )
-                      .toList(),
-                  notifications:
-                  unreadNotifications
-                      .map(
-                        (notification) =>
-                    notification.reference,
-                  )
-                      .toList(),
-                );
-              },
+                      markEverythingAsRead(
+                        incidents: unreadIncidents
+                            .map((incident) => incident.reference)
+                            .toList(),
+                        notifications: unreadNotifications
+                            .map((notification) => notification.reference)
+                            .toList(),
+                      );
+                    },
               icon: Stack(
                 clipBehavior: Clip.none,
                 children: [
                   markingAsRead
                       ? const SizedBox(
-                    width: 26,
-                    height: 26,
-                    child:
-                    CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: navy,
-                    ),
-                  )
+                          width: 26,
+                          height: 26,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: navy,
+                          ),
+                        )
                       : const Icon(
-                    Icons
-                        .notifications_none_rounded,
-                    color: navy,
-                    size: 28,
-                  ),
+                          Icons.notifications_none_rounded,
+                          color: navy,
+                          size: 28,
+                        ),
 
                   if (unreadCount > 0)
                     Positioned(
@@ -246,25 +198,18 @@ class _NotificationBellState
                           minWidth: 21,
                           minHeight: 21,
                         ),
-                        padding:
-                        const EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 5,
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
                           color: coral,
-                          borderRadius:
-                          BorderRadius.circular(20),
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 2,
-                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.white, width: 2),
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          unreadCount > 99
-                              ? '99+'
-                              : '$unreadCount',
+                          unreadCount > 99 ? '99+' : '$unreadCount',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 9,

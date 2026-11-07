@@ -51,9 +51,7 @@ class _LoginPageState extends State<LoginPage> {
     if (!successful) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            authProvider.errorMessage ?? 'Unable to sign in.',
-          ),
+          content: Text(authProvider.errorMessage ?? 'Unable to sign in.'),
           backgroundColor: Colors.red,
         ),
       );
@@ -139,10 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         Text(
                           'Login to report a fire',
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 15,
-                          ),
+                          style: TextStyle(color: Colors.black54, fontSize: 15),
                         ),
                         SizedBox(width: 6),
                         Icon(
@@ -152,10 +147,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         Text(
                           '!',
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 15,
-                          ),
+                          style: TextStyle(color: Colors.black54, fontSize: 15),
                         ),
                       ],
                     ),
@@ -200,10 +192,8 @@ class _LoginPageState extends State<LoginPage> {
                               textInputAction: TextInputAction.next,
                               autocorrect: false,
                               decoration: InputDecoration(
-                                labelText: 'Student email',
-                                prefixIcon: const Icon(
-                                  Icons.email_outlined,
-                                ),
+                                labelText: 'ALU email',
+                                prefixIcon: const Icon(Icons.email_outlined),
                                 filled: true,
                                 fillColor: background,
                                 border: OutlineInputBorder(
@@ -254,9 +244,7 @@ class _LoginPageState extends State<LoginPage> {
                               },
                               decoration: InputDecoration(
                                 labelText: 'Password',
-                                prefixIcon: const Icon(
-                                  Icons.lock_outline,
-                                ),
+                                prefixIcon: const Icon(Icons.lock_outline),
                                 suffixIcon: IconButton(
                                   onPressed: () {
                                     setState(() {
@@ -315,8 +303,9 @@ class _LoginPageState extends State<LoginPage> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: coral,
                                   foregroundColor: Colors.white,
-                                  disabledBackgroundColor:
-                                  coral.withValues(alpha: 0.55),
+                                  disabledBackgroundColor: coral.withValues(
+                                    alpha: 0.55,
+                                  ),
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(14),
@@ -324,31 +313,28 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 child: authProvider.isLoading
                                     ? const SizedBox(
-                                  width: 23,
-                                  height: 23,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2.5,
-                                  ),
-                                )
+                                        width: 23,
+                                        height: 23,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2.5,
+                                        ),
+                                      )
                                     : const Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.login,
-                                      size: 20,
-                                    ),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      'Sign In',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.login, size: 20),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            'Sign In',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                  ],
-                                ),
                               ),
                             ),
                           ],
@@ -370,14 +356,13 @@ class _LoginPageState extends State<LoginPage> {
                           onPressed: authProvider.isLoading
                               ? null
                               : () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                const SignUpPage(),
-                              ),
-                            );
-                          },
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const SignUpPage(),
+                                    ),
+                                  );
+                                },
                           child: const Text(
                             'Sign Up',
                             style: TextStyle(
@@ -395,18 +380,11 @@ class _LoginPageState extends State<LoginPage> {
                     const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.shield_outlined,
-                          color: mint,
-                          size: 17,
-                        ),
+                        Icon(Icons.shield_outlined, color: mint, size: 17),
                         SizedBox(width: 6),
                         Text(
                           'Your reports are handled securely.',
-                          style: TextStyle(
-                            color: Colors.black45,
-                            fontSize: 12,
-                          ),
+                          style: TextStyle(color: Colors.black45, fontSize: 12),
                         ),
                       ],
                     ),

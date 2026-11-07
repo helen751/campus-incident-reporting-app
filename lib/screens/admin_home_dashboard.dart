@@ -3,20 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class AdminHomeDashboard extends StatefulWidget {
-  const AdminHomeDashboard({
-    super.key,
-    required this.onReviewPressed,
-  });
+  const AdminHomeDashboard({super.key, required this.onReviewPressed});
 
   final VoidCallback onReviewPressed;
 
   @override
-  State<AdminHomeDashboard> createState() =>
-      _AdminHomeDashboardState();
+  State<AdminHomeDashboard> createState() => _AdminHomeDashboardState();
 }
 
-class _AdminHomeDashboardState
-    extends State<AdminHomeDashboard>
+class _AdminHomeDashboardState extends State<AdminHomeDashboard>
     with TickerProviderStateMixin {
   static const Color navy = Color(0xFF12355B);
   static const Color coral = Color(0xFFFF5A3C);
@@ -46,15 +41,13 @@ class _AdminHomeDashboardState
       curve: Curves.easeOut,
     );
 
-    pagePosition = Tween<Offset>(
-      begin: const Offset(0, 0.07),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: entranceController,
-        curve: Curves.easeOutCubic,
-      ),
-    );
+    pagePosition = Tween<Offset>(begin: const Offset(0, 0.07), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: entranceController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
 
     // moving the admin image gently
     personController = AnimationController(
@@ -62,14 +55,8 @@ class _AdminHomeDashboardState
       duration: const Duration(milliseconds: 1700),
     );
 
-    personMovement = Tween<double>(
-      begin: -4,
-      end: 5,
-    ).animate(
-      CurvedAnimation(
-        parent: personController,
-        curve: Curves.easeInOut,
-      ),
+    personMovement = Tween<double>(begin: -4, end: 5).animate(
+      CurvedAnimation(parent: personController, curve: Curves.easeInOut),
     );
 
     entranceController.forward();
@@ -146,9 +133,7 @@ class _AdminHomeDashboardState
   }
 
   // returning the incident date for sorting
-  DateTime incidentDate(
-      Map<String, dynamic> incident,
-      ) {
+  DateTime incidentDate(Map<String, dynamic> incident) {
     final value = incident['createdAt'];
 
     if (value is Timestamp) {
@@ -163,104 +148,62 @@ class _AdminHomeDashboardState
     final user = FirebaseAuth.instance.currentUser;
     final displayName = user?.displayName?.trim();
 
-    final firstName =
-    displayName != null && displayName.isNotEmpty
+    final firstName = displayName != null && displayName.isNotEmpty
         ? displayName.split(' ').first
         : 'Admin';
 
     return Container(
       color: background,
-      child: StreamBuilder<
-          QuerySnapshot<Map<String, dynamic>>>(
-        stream: FirebaseFirestore.instance
-            .collection('incidents')
-            .snapshots(),
+      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        stream: FirebaseFirestore.instance.collection('incidents').snapshots(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState ==
-              ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: coral,
-              ),
-            );
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: coral));
           }
 
           final documents = snapshot.data?.docs ?? [];
 
           final incidents = documents.map((document) {
-            return <String, dynamic>{
-              ...document.data(),
-              'id': document.id,
-            };
+            return <String, dynamic>{...document.data(), 'id': document.id};
           }).toList();
 
-          incidents.sort(
-                (first, second) {
-              return incidentDate(second).compareTo(
-                incidentDate(first),
-              );
-            },
-          );
+          incidents.sort((first, second) {
+            return incidentDate(second).compareTo(incidentDate(first));
+          });
 
-          final submittedCount =
-              incidents.where((incident) {
-                return incident['status']
-                    ?.toString()
-                    .toLowerCase() ==
-                    'submitted';
-              }).length;
+          final submittedCount = incidents.where((incident) {
+            return incident['status']?.toString().toLowerCase() == 'submitted';
+          }).length;
 
-          final verifiedCount =
-              incidents.where((incident) {
-                return incident['status']
-                    ?.toString()
-                    .toLowerCase() ==
-                    'verified';
-              }).length;
+          final verifiedCount = incidents.where((incident) {
+            return incident['status']?.toString().toLowerCase() == 'verified';
+          }).length;
 
-          final progressCount =
-              incidents.where((incident) {
-                return incident['status']
-                    ?.toString()
-                    .toLowerCase() ==
-                    'in progress';
-              }).length;
+          final progressCount = incidents.where((incident) {
+            return incident['status']?.toString().toLowerCase() ==
+                'in progress';
+          }).length;
 
-          final resolvedCount =
-              incidents.where((incident) {
-                return incident['status']
-                    ?.toString()
-                    .toLowerCase() ==
-                    'resolved';
-              }).length;
+          final resolvedCount = incidents.where((incident) {
+            return incident['status']?.toString().toLowerCase() == 'resolved';
+          }).length;
 
-          final activeIncidents =
-          incidents.where((incident) {
-            return incident['status']
-                ?.toString()
-                .toLowerCase() !=
-                'resolved';
+          final activeIncidents = incidents.where((incident) {
+            return incident['status']?.toString().toLowerCase() != 'resolved';
           }).toList();
 
-          final resolutionProgress =
-          incidents.isEmpty
+          final resolutionProgress = incidents.isEmpty
               ? 0.0
               : resolvedCount / incidents.length;
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(
-              18,
-              18,
-              18,
-              35,
-            ),
+            padding: const EdgeInsets.fromLTRB(18, 18, 18, 35),
             child: FadeTransition(
               opacity: pageOpacity,
               child: SlideTransition(
                 position: pagePosition,
                 child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Welcome, $firstName',
@@ -275,10 +218,7 @@ class _AdminHomeDashboardState
 
                     const Text(
                       'Here is what needs your attention today.',
-                      style: TextStyle(
-                        color: Colors.black54,
-                        fontSize: 14,
-                      ),
+                      style: TextStyle(color: Colors.black54, fontSize: 14),
                     ),
 
                     const SizedBox(height: 20),
@@ -288,8 +228,7 @@ class _AdminHomeDashboardState
                       submittedCount: submittedCount,
                       personMovement: personMovement,
                       personController: personController,
-                      onReviewPressed:
-                      widget.onReviewPressed,
+                      onReviewPressed: widget.onReviewPressed,
                     ),
 
                     const SizedBox(height: 26),
@@ -312,8 +251,7 @@ class _AdminHomeDashboardState
                           child: AdminStatCard(
                             title: 'Submitted',
                             number: submittedCount,
-                            icon:
-                            Icons.pending_actions_rounded,
+                            icon: Icons.pending_actions_rounded,
                             color: coral,
                             delay: 0,
                           ),
@@ -341,8 +279,7 @@ class _AdminHomeDashboardState
                           child: AdminStatCard(
                             title: 'In progress',
                             number: progressCount,
-                            icon:
-                            Icons.construction_rounded,
+                            icon: Icons.construction_rounded,
                             color: Colors.orange,
                             delay: 200,
                           ),
@@ -369,23 +306,18 @@ class _AdminHomeDashboardState
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius:
-                        BorderRadius.circular(22),
-                        border: Border.all(
-                          color:
-                          const Color(0xFFE1E8F0),
-                        ),
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(color: const Color(0xFFE1E8F0)),
                         boxShadow: [
                           BoxShadow(
-                            color: navy.withOpacity(0.06),
+                            color: navy.withValues(alpha: 0.06),
                             blurRadius: 18,
                             offset: const Offset(0, 8),
                           ),
                         ],
                       ),
                       child: Column(
-                        crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
@@ -393,12 +325,8 @@ class _AdminHomeDashboardState
                                 width: 43,
                                 height: 43,
                                 decoration: BoxDecoration(
-                                  color:
-                                  mint.withOpacity(0.12),
-                                  borderRadius:
-                                  BorderRadius.circular(
-                                    14,
-                                  ),
+                                  color: mint.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
                                 child: const Icon(
                                   Icons.insights_rounded,
@@ -410,24 +338,21 @@ class _AdminHomeDashboardState
 
                               const Expanded(
                                 child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       'Resolution progress',
                                       style: TextStyle(
                                         color: navy,
                                         fontSize: 15,
-                                        fontWeight:
-                                        FontWeight.bold,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     SizedBox(height: 3),
                                     Text(
                                       'Resolved incidents compared to all reports',
                                       style: TextStyle(
-                                        color:
-                                        Colors.black45,
+                                        color: Colors.black45,
                                         fontSize: 11,
                                       ),
                                     ),
@@ -449,30 +374,20 @@ class _AdminHomeDashboardState
                           const SizedBox(height: 17),
 
                           ClipRRect(
-                            borderRadius:
-                            BorderRadius.circular(10),
-                            child:
-                            TweenAnimationBuilder<double>(
+                            borderRadius: BorderRadius.circular(10),
+                            child: TweenAnimationBuilder<double>(
                               tween: Tween<double>(
                                 begin: 0,
                                 end: resolutionProgress,
                               ),
-                              duration: const Duration(
-                                milliseconds: 900,
-                              ),
+                              duration: const Duration(milliseconds: 900),
                               curve: Curves.easeOutCubic,
-                              builder: (
-                                  context,
-                                  value,
-                                  child,
-                                  ) {
+                              builder: (context, value, child) {
                                 return LinearProgressIndicator(
                                   value: value,
                                   minHeight: 9,
-                                  backgroundColor:
-                                  mint.withOpacity(0.12),
-                                  valueColor:
-                                  const AlwaysStoppedAnimation(
+                                  backgroundColor: mint.withValues(alpha: 0.12),
+                                  valueColor: const AlwaysStoppedAnimation(
                                     mint,
                                   ),
                                 );
@@ -499,8 +414,7 @@ class _AdminHomeDashboardState
                         ),
 
                         TextButton(
-                          onPressed:
-                          widget.onReviewPressed,
+                          onPressed: widget.onReviewPressed,
                           child: const Text(
                             'View all',
                             style: TextStyle(
@@ -520,67 +434,38 @@ class _AdminHomeDashboardState
                       Column(
                         children: List.generate(
                           activeIncidents.take(3).length,
-                              (index) {
-                            final incident =
-                            activeIncidents[index];
+                          (index) {
+                            final incident = activeIncidents[index];
 
                             final status =
-                                incident['status']
-                                    ?.toString() ??
-                                    'Submitted';
+                                incident['status']?.toString() ?? 'Submitted';
 
-                            return TweenAnimationBuilder<
-                                double>(
-                              tween: Tween<double>(
-                                begin: 0,
-                                end: 1,
-                              ),
+                            return TweenAnimationBuilder<double>(
+                              tween: Tween<double>(begin: 0, end: 1),
                               duration: Duration(
-                                milliseconds:
-                                350 + (index * 100),
+                                milliseconds: 350 + (index * 100),
                               ),
                               curve: Curves.easeOutBack,
-                              builder: (
-                                  context,
-                                  animation,
-                                  child,
-                                  ) {
+                              builder: (context, animation, child) {
                                 return Opacity(
-                                  opacity: animation.clamp(
-                                    0.0,
-                                    1.0,
-                                  ),
-                                  child:
-                                  Transform.translate(
-                                    offset: Offset(
-                                      35 *
-                                          (1 - animation),
-                                      0,
-                                    ),
+                                  opacity: animation.clamp(0.0, 1.0),
+                                  child: Transform.translate(
+                                    offset: Offset(35 * (1 - animation), 0),
                                     child: child,
                                   ),
                                 );
                               },
                               child: Padding(
-                                padding:
-                                const EdgeInsets.only(
-                                  bottom: 13,
-                                ),
-                                child:
-                                AdminReviewIncidentCard(
+                                padding: const EdgeInsets.only(bottom: 13),
+                                child: AdminReviewIncidentCard(
                                   incident: incident,
                                   date: formatDate(
-                                    incident[
-                                    'updatedAt'] ??
-                                        incident[
-                                        'createdAt'],
+                                    incident['updatedAt'] ??
+                                        incident['createdAt'],
                                   ),
-                                  color:
-                                  statusColor(status),
-                                  icon:
-                                  statusIcon(status),
-                                  onPressed: widget
-                                      .onReviewPressed,
+                                  color: statusColor(status),
+                                  icon: statusIcon(status),
+                                  onPressed: widget.onReviewPressed,
                                 ),
                               ),
                             );
@@ -596,18 +481,15 @@ class _AdminHomeDashboardState
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
                         color: navy,
-                        borderRadius:
-                        BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Row(
                         children: [
                           CircleAvatar(
                             radius: 23,
-                            backgroundColor:
-                            Colors.white12,
+                            backgroundColor: Colors.white12,
                             child: Icon(
-                              Icons
-                                  .admin_panel_settings_outlined,
+                              Icons.admin_panel_settings_outlined,
                               color: Colors.white,
                             ),
                           ),
@@ -616,16 +498,14 @@ class _AdminHomeDashboardState
 
                           Expanded(
                             child: Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   'Administrator responsibility',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 14,
-                                    fontWeight:
-                                    FontWeight.bold,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 SizedBox(height: 5),
@@ -681,15 +561,12 @@ class AdminReviewHero extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            navy,
-            Color(0xFF1D5685),
-          ],
+          colors: [navy, Color(0xFF1D5685)],
         ),
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: navy.withOpacity(0.22),
+            color: navy.withValues(alpha: 0.22),
             blurRadius: 25,
             offset: const Offset(0, 12),
           ),
@@ -706,7 +583,7 @@ class AdminReviewHero extends StatelessWidget {
                 width: 180,
                 height: 180,
                 decoration: BoxDecoration(
-                  color: coral.withOpacity(0.14),
+                  color: coral.withValues(alpha: 0.14),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -719,7 +596,7 @@ class AdminReviewHero extends StatelessWidget {
                 width: 150,
                 height: 150,
                 decoration: BoxDecoration(
-                  color: mint.withOpacity(0.11),
+                  color: mint.withValues(alpha: 0.11),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -740,8 +617,7 @@ class AdminReviewHero extends StatelessWidget {
                 child: const Row(
                   children: [
                     Icon(
-                      Icons
-                          .admin_panel_settings_rounded,
+                      Icons.admin_panel_settings_rounded,
                       color: Colors.white,
                       size: 15,
                     ),
@@ -765,8 +641,7 @@ class AdminReviewHero extends StatelessWidget {
               top: 75,
               right: 145,
               child: Column(
-                crossAxisAlignment:
-                CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
                     'Review Reports.\nKeep campus safe.',
@@ -811,15 +686,10 @@ class AdminReviewHero extends StatelessWidget {
                     borderRadius: BorderRadius.circular(15),
                   ),
                 ),
-                icon: const Icon(
-                  Icons.fact_check_outlined,
-                  size: 19,
-                ),
+                icon: const Icon(Icons.fact_check_outlined, size: 19),
                 label: const Text(
                   'Review reports',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -836,26 +706,17 @@ class AdminReviewHero extends StatelessWidget {
                   height: 235,
                   fit: BoxFit.contain,
                   alignment: Alignment.bottomCenter,
-                  errorBuilder: (
-                      context,
-                      error,
-                      stackTrace,
-                      ) {
+                  errorBuilder: (context, error, stackTrace) {
                     return Container(
                       width: 135,
                       height: 165,
-                      margin: const EdgeInsets.only(
-                        right: 20,
-                        bottom: 20,
-                      ),
+                      margin: const EdgeInsets.only(right: 20, bottom: 20),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.12),
-                        borderRadius:
-                        BorderRadius.circular(30),
+                        color: Colors.white.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(30),
                       ),
                       child: const Icon(
-                        Icons
-                            .admin_panel_settings_rounded,
+                        Icons.admin_panel_settings_rounded,
                         color: Colors.white,
                         size: 65,
                       ),
@@ -864,10 +725,7 @@ class AdminReviewHero extends StatelessWidget {
                 ),
                 builder: (context, child) {
                   return Transform.translate(
-                    offset: Offset(
-                      0,
-                      personMovement.value,
-                    ),
+                    offset: Offset(0, personMovement.value),
                     child: child,
                   );
                 },
@@ -901,13 +759,8 @@ class AdminStatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
-      tween: Tween<double>(
-        begin: 0,
-        end: 1,
-      ),
-      duration: Duration(
-        milliseconds: 450 + delay,
-      ),
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: Duration(milliseconds: 450 + delay),
       curve: Curves.easeOutBack,
       builder: (context, animation, child) {
         return Opacity(
@@ -923,12 +776,10 @@ class AdminStatCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: color.withOpacity(0.16),
-          ),
+          border: Border.all(color: color.withValues(alpha: 0.16)),
           boxShadow: [
             BoxShadow(
-              color: navy.withOpacity(0.05),
+              color: navy.withValues(alpha: 0.05),
               blurRadius: 15,
               offset: const Offset(0, 7),
             ),
@@ -940,22 +791,17 @@ class AdminStatCard extends StatelessWidget {
               width: 43,
               height: 43,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.11),
+                color: color.withValues(alpha: 0.11),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 22,
-              ),
+              child: Icon(icon, color: color, size: 22),
             ),
 
             const SizedBox(width: 12),
 
             Expanded(
               child: Column(
-                crossAxisAlignment:
-                CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     '$number',
@@ -1007,24 +853,15 @@ class AdminReviewIncidentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title =
-        incident['title']?.toString() ??
-            'Campus incident';
+    final title = incident['title']?.toString() ?? 'Campus incident';
 
-    final location =
-        incident['location']?.toString() ??
-            'ALU Campus';
+    final location = incident['location']?.toString() ?? 'ALU Campus';
 
-    final status =
-        incident['status']?.toString() ??
-            'Submitted';
+    final status = incident['status']?.toString() ?? 'Submitted';
 
-    final reporter =
-        incident['reporterName']?.toString() ??
-            'CampusFire User';
+    final reporter = incident['reporterName']?.toString() ?? 'CampusFire User';
 
-    final imageUrl =
-        incident['imageUrl']?.toString() ?? '';
+    final imageUrl = incident['imageUrl']?.toString() ?? '';
 
     return Material(
       color: Colors.white,
@@ -1037,9 +874,7 @@ class AdminReviewIncidentCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(21),
-            border: Border.all(
-              color: const Color(0xFFE1E8F0),
-            ),
+            border: Border.all(color: const Color(0xFFE1E8F0)),
           ),
           child: Row(
             children: [
@@ -1047,33 +882,25 @@ class AdminReviewIncidentCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15),
                 child: imageUrl.isNotEmpty
                     ? Image.network(
-                  imageUrl,
-                  width: 68,
-                  height: 74,
-                  fit: BoxFit.cover,
-                  errorBuilder: (
-                      context,
-                      error,
-                      stackTrace,
-                      ) {
-                    return AdminStatusPlaceholder(
-                      color: color,
-                      icon: icon,
-                    );
-                  },
-                )
-                    : AdminStatusPlaceholder(
-                  color: color,
-                  icon: icon,
-                ),
+                        imageUrl,
+                        width: 68,
+                        height: 74,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return AdminStatusPlaceholder(
+                            color: color,
+                            icon: icon,
+                          );
+                        },
+                      )
+                    : AdminStatusPlaceholder(color: color, icon: icon),
               ),
 
               const SizedBox(width: 12),
 
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
@@ -1081,8 +908,7 @@ class AdminReviewIncidentCard extends StatelessWidget {
                           child: Text(
                             title,
                             maxLines: 1,
-                            overflow:
-                            TextOverflow.ellipsis,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: navy,
                               fontSize: 14,
@@ -1099,9 +925,8 @@ class AdminReviewIncidentCard extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: color.withOpacity(0.11),
-                            borderRadius:
-                            BorderRadius.circular(12),
+                            color: color.withValues(alpha: 0.11),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
                             status,
@@ -1129,8 +954,7 @@ class AdminReviewIncidentCard extends StatelessWidget {
                           child: Text(
                             location,
                             maxLines: 1,
-                            overflow:
-                            TextOverflow.ellipsis,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: Colors.black54,
                               fontSize: 10,
@@ -1154,8 +978,7 @@ class AdminReviewIncidentCard extends StatelessWidget {
                           child: Text(
                             reporter,
                             maxLines: 1,
-                            overflow:
-                            TextOverflow.ellipsis,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: Colors.black45,
                               fontSize: 10,
@@ -1177,10 +1000,7 @@ class AdminReviewIncidentCard extends StatelessWidget {
 
               const SizedBox(width: 6),
 
-              const Icon(
-                Icons.chevron_right_rounded,
-                color: Colors.black38,
-              ),
+              const Icon(Icons.chevron_right_rounded, color: Colors.black38),
             ],
           ),
         ),
@@ -1204,12 +1024,8 @@ class AdminStatusPlaceholder extends StatelessWidget {
     return Container(
       width: 68,
       height: 74,
-      color: color.withOpacity(0.10),
-      child: Icon(
-        icon,
-        color: color,
-        size: 28,
-      ),
+      color: color.withValues(alpha: 0.10),
+      child: Icon(icon, color: color, size: 28),
     );
   }
 }
@@ -1221,24 +1037,15 @@ class AdminEmptyQueue extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 30,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: const Color(0xFFE1E8F0),
-        ),
+        border: Border.all(color: const Color(0xFFE1E8F0)),
       ),
       child: const Column(
         children: [
-          Icon(
-            Icons.task_alt_rounded,
-            color: Color(0xFF2EC4B6),
-            size: 45,
-          ),
+          Icon(Icons.task_alt_rounded, color: Color(0xFF2EC4B6), size: 45),
           SizedBox(height: 10),
           Text(
             'All caught up',
@@ -1252,10 +1059,7 @@ class AdminEmptyQueue extends StatelessWidget {
           Text(
             'There are no active incidents waiting for review.',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.black54,
-              fontSize: 12,
-            ),
+            style: TextStyle(color: Colors.black54, fontSize: 12),
           ),
         ],
       ),

@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart'
-    hide AuthProvider;
+import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,9 +12,7 @@ import 'screens/login_page.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(const CampusFireApp());
 }
@@ -31,9 +28,7 @@ class CampusFireApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'CampusFire',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFFFF5A3C),
-          ),
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFF5A3C)),
           useMaterial3: true,
         ),
         home: const AuthChecker(),
@@ -50,8 +45,7 @@ class AuthChecker extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, authSnapshot) {
-        if (authSnapshot.connectionState ==
-            ConnectionState.waiting) {
+        if (authSnapshot.connectionState == ConnectionState.waiting) {
           return const LoadingScreen();
         }
 
@@ -63,15 +57,13 @@ class AuthChecker extends StatelessWidget {
         }
 
         // reading the signed-in user's role
-        return StreamBuilder<
-            DocumentSnapshot<Map<String, dynamic>>>(
+        return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
           stream: FirebaseFirestore.instance
               .collection('users')
               .doc(user.uid)
               .snapshots(),
           builder: (context, userSnapshot) {
-            if (userSnapshot.connectionState ==
-                ConnectionState.waiting) {
+            if (userSnapshot.connectionState == ConnectionState.waiting) {
               return const LoadingScreen();
             }
 
@@ -81,17 +73,12 @@ class AuthChecker extends StatelessWidget {
 
             final userData = userSnapshot.data?.data();
 
-            final role = userData?['role']
-                ?.toString()
-                .trim()
-                .toLowerCase();
+            final role = userData?['role']?.toString().trim().toLowerCase();
 
             final isAdmin = role == 'campus admin';
 
             // opening the shared dashboard structure
-            return DashboardPage(
-              isAdmin: isAdmin,
-            );
+            return DashboardPage(isAdmin: isAdmin);
           },
         );
       },
@@ -106,11 +93,7 @@ class LoadingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       backgroundColor: Color(0xFFF5F7FB),
-      body: Center(
-        child: CircularProgressIndicator(
-          color: Color(0xFFFF5A3C),
-        ),
-      ),
+      body: Center(child: CircularProgressIndicator(color: Color(0xFFFF5A3C))),
     );
   }
 }

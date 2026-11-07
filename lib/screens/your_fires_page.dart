@@ -16,11 +16,7 @@ class _YourFiresPageState extends State<YourFiresPage>
   static const Color mint = Color(0xFF2EC4B6);
   static const Color background = Color(0xFFF4F7FB);
 
-  final List<String> filters = [
-    'All',
-    'Active',
-    'Resolved',
-  ];
+  final List<String> filters = ['All', 'Active', 'Resolved'];
 
   String selectedFilter = 'All';
 
@@ -46,15 +42,13 @@ class _YourFiresPageState extends State<YourFiresPage>
       curve: Curves.easeOut,
     );
 
-    pagePosition = Tween<Offset>(
-      begin: const Offset(0, 0.08),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: entranceController,
-        curve: Curves.easeOutCubic,
-      ),
-    );
+    pagePosition = Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: entranceController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
 
     // controlling the fire movement
     fireController = AnimationController(
@@ -65,12 +59,7 @@ class _YourFiresPageState extends State<YourFiresPage>
     firePulse = Tween<double>(
       begin: 0.92,
       end: 1.12,
-    ).animate(
-      CurvedAnimation(
-        parent: fireController,
-        curve: Curves.easeInOut,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: fireController, curve: Curves.easeInOut));
 
     entranceController.forward();
     fireController.repeat(reverse: true);
@@ -153,9 +142,7 @@ class _YourFiresPageState extends State<YourFiresPage>
   }
 
   // returning the incident date for sorting
-  DateTime incidentDate(
-      Map<String, dynamic> incident,
-      ) {
+  DateTime incidentDate(Map<String, dynamic> incident) {
     final value = incident['createdAt'];
 
     if (value is Timestamp) {
@@ -166,29 +153,18 @@ class _YourFiresPageState extends State<YourFiresPage>
   }
 
   // opening the full incident
-  void openIncident(
-      Map<String, dynamic> incident,
-      ) {
-    final title =
-        incident['title']?.toString() ??
-            'Campus incident';
+  void openIncident(Map<String, dynamic> incident) {
+    final title = incident['title']?.toString() ?? 'Campus incident';
 
-    final status =
-        incident['status']?.toString() ??
-            'Submitted';
+    final status = incident['status']?.toString() ?? 'Submitted';
 
-    final category =
-        incident['category']?.toString() ?? 'Other';
+    final category = incident['category']?.toString() ?? 'Other';
 
-    final location =
-        incident['location']?.toString() ??
-            'ALU Campus';
+    final location = incident['location']?.toString() ?? 'ALU Campus';
 
-    final description =
-        incident['description']?.toString() ?? '';
+    final description = incident['description']?.toString() ?? '';
 
-    final imageUrl =
-        incident['imageUrl']?.toString() ?? '';
+    final imageUrl = incident['imageUrl']?.toString() ?? '';
 
     final color = statusColor(status);
 
@@ -198,26 +174,18 @@ class _YourFiresPageState extends State<YourFiresPage>
       backgroundColor: Colors.transparent,
       builder: (context) {
         return DraggableScrollableSheet(
-          initialChildSize:
-          imageUrl.isNotEmpty ? 0.86 : 0.70,
+          initialChildSize: imageUrl.isNotEmpty ? 0.86 : 0.70,
           minChildSize: 0.48,
           maxChildSize: 0.94,
           builder: (context, controller) {
             return Container(
               decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(32),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
               ),
               child: ListView(
                 controller: controller,
-                padding: const EdgeInsets.fromLTRB(
-                  22,
-                  12,
-                  22,
-                  40,
-                ),
+                padding: const EdgeInsets.fromLTRB(22, 12, 22, 40),
                 children: [
                   Center(
                     child: Container(
@@ -225,8 +193,7 @@ class _YourFiresPageState extends State<YourFiresPage>
                       height: 5,
                       decoration: BoxDecoration(
                         color: Colors.black12,
-                        borderRadius:
-                        BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                   ),
@@ -235,18 +202,13 @@ class _YourFiresPageState extends State<YourFiresPage>
 
                   if (imageUrl.isNotEmpty)
                     ClipRRect(
-                      borderRadius:
-                      BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(24),
                       child: Image.network(
                         imageUrl,
                         width: double.infinity,
                         height: 235,
                         fit: BoxFit.cover,
-                        loadingBuilder: (
-                            context,
-                            child,
-                            progress,
-                            ) {
+                        loadingBuilder: (context, child, progress) {
                           if (progress == null) {
                             return child;
                           }
@@ -255,17 +217,12 @@ class _YourFiresPageState extends State<YourFiresPage>
                             height: 235,
                             color: background,
                             alignment: Alignment.center,
-                            child:
-                            const CircularProgressIndicator(
+                            child: const CircularProgressIndicator(
                               color: coral,
                             ),
                           );
                         },
-                        errorBuilder: (
-                            context,
-                            error,
-                            stackTrace,
-                            ) {
+                        errorBuilder: (context, error, stackTrace) {
                           return Container(
                             height: 180,
                             color: background,
@@ -280,12 +237,10 @@ class _YourFiresPageState extends State<YourFiresPage>
                       ),
                     ),
 
-                  if (imageUrl.isNotEmpty)
-                    const SizedBox(height: 22),
+                  if (imageUrl.isNotEmpty) const SizedBox(height: 22),
 
                   Row(
-                    crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
                         child: Text(
@@ -310,9 +265,7 @@ class _YourFiresPageState extends State<YourFiresPage>
 
                   const SizedBox(height: 24),
 
-                  YourFireProgress(
-                    currentStatus: status,
-                  ),
+                  YourFireProgress(currentStatus: status),
 
                   const SizedBox(height: 25),
 
@@ -359,9 +312,8 @@ class _YourFiresPageState extends State<YourFiresPage>
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.10),
-                      borderRadius:
-                      BorderRadius.circular(19),
+                      color: color.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(19),
                     ),
                     child: Row(
                       children: [
@@ -369,21 +321,17 @@ class _YourFiresPageState extends State<YourFiresPage>
                           width: 45,
                           height: 45,
                           decoration: BoxDecoration(
-                            color: color.withOpacity(0.15),
+                            color: color.withValues(alpha: 0.15),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(
-                            statusIcon(status),
-                            color: color,
-                          ),
+                          child: Icon(statusIcon(status), color: color),
                         ),
 
                         const SizedBox(width: 13),
 
                         Expanded(
                           child: Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
                                 'Current status',
@@ -407,8 +355,7 @@ class _YourFiresPageState extends State<YourFiresPage>
 
                         Text(
                           formatDate(
-                            incident['updatedAt'] ??
-                                incident['createdAt'],
+                            incident['updatedAt'] ?? incident['createdAt'],
                           ),
                           style: const TextStyle(
                             color: Colors.black45,
@@ -434,97 +381,62 @@ class _YourFiresPageState extends State<YourFiresPage>
     if (user == null) {
       return const YourFiresEmpty(
         title: 'Sign in required',
-        message:
-        'Sign in to see the incidents you reported.',
+        message: 'Sign in to see the incidents you reported.',
       );
     }
 
     return Container(
       color: background,
-      child: StreamBuilder<
-          QuerySnapshot<Map<String, dynamic>>>(
+      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         // reading only incidents reported by this user
         stream: FirebaseFirestore.instance
             .collection('incidents')
-            .where(
-          'reportedBy',
-          isEqualTo: user.uid,
-        )
+            .where('reportedBy', isEqualTo: user.uid)
             .snapshots(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState ==
-              ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: coral,
-              ),
-            );
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: coral));
           }
 
           if (snapshot.hasError) {
-            return YourFiresError(
-              message: snapshot.error.toString(),
-            );
+            return YourFiresError(message: snapshot.error.toString());
           }
 
           final documents = snapshot.data?.docs ?? [];
 
           final incidents = documents.map((document) {
-            return <String, dynamic>{
-              ...document.data(),
-              'id': document.id,
-            };
+            return <String, dynamic>{...document.data(), 'id': document.id};
           }).toList();
 
           // sorting reports from newest to oldest
-          incidents.sort(
-                (first, second) {
-              return incidentDate(second).compareTo(
-                incidentDate(first),
-              );
-            },
-          );
+          incidents.sort((first, second) {
+            return incidentDate(second).compareTo(incidentDate(first));
+          });
 
           final resolvedCount = incidents.where((incident) {
-            final status =
-                incident['status']?.toString() ?? '';
+            final status = incident['status']?.toString() ?? '';
 
             return status.toLowerCase() == 'resolved';
           }).length;
 
-          final activeCount =
-              incidents.length - resolvedCount;
+          final activeCount = incidents.length - resolvedCount;
 
-          final filteredIncidents =
-          selectedFilter == 'All'
+          final filteredIncidents = selectedFilter == 'All'
               ? incidents
               : selectedFilter == 'Resolved'
               ? incidents.where((incident) {
-            final status =
-                incident['status']
-                    ?.toString() ??
-                    '';
+                  final status = incident['status']?.toString() ?? '';
 
-            return status.toLowerCase() ==
-                'resolved';
-          }).toList()
+                  return status.toLowerCase() == 'resolved';
+                }).toList()
               : incidents.where((incident) {
-            final status =
-                incident['status']
-                    ?.toString() ??
-                    '';
+                  final status = incident['status']?.toString() ?? '';
 
-            return status.toLowerCase() !=
-                'resolved';
-          }).toList();
+                  return status.toLowerCase() != 'resolved';
+                }).toList();
 
           return ListView(
-            padding: const EdgeInsets.fromLTRB(
-              18,
-              18,
-              18,
-              35,
-            ),
+            padding: const EdgeInsets.fromLTRB(18, 18, 18, 35),
             children: [
               FadeTransition(
                 opacity: pageOpacity,
@@ -536,16 +448,12 @@ class _YourFiresPageState extends State<YourFiresPage>
                       gradient: const LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [
-                          coral,
-                          Color(0xFFFF795F),
-                        ],
+                        colors: [coral, Color(0xFFFF795F)],
                       ),
-                      borderRadius:
-                      BorderRadius.circular(28),
+                      borderRadius: BorderRadius.circular(28),
                       boxShadow: [
                         BoxShadow(
-                          color: coral.withOpacity(0.25),
+                          color: coral.withValues(alpha: 0.25),
                           blurRadius: 25,
                           offset: const Offset(0, 12),
                         ),
@@ -560,8 +468,7 @@ class _YourFiresPageState extends State<YourFiresPage>
                             width: 150,
                             height: 150,
                             decoration: BoxDecoration(
-                              color:
-                              Colors.white.withOpacity(0.12),
+                              color: Colors.white.withValues(alpha: 0.12),
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -574,15 +481,14 @@ class _YourFiresPageState extends State<YourFiresPage>
                             width: 125,
                             height: 125,
                             decoration: BoxDecoration(
-                              color: navy.withOpacity(0.10),
+                              color: navy.withValues(alpha: 0.10),
                               shape: BoxShape.circle,
                             ),
                           ),
                         ),
 
                         Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
@@ -592,16 +498,13 @@ class _YourFiresPageState extends State<YourFiresPage>
                                     width: 52,
                                     height: 52,
                                     decoration: BoxDecoration(
-                                      color: Colors.white
-                                          .withOpacity(0.18),
-                                      borderRadius:
-                                      BorderRadius.circular(
-                                        17,
+                                      color: Colors.white.withValues(
+                                        alpha: 0.18,
                                       ),
+                                      borderRadius: BorderRadius.circular(17),
                                     ),
                                     child: const Icon(
-                                      Icons
-                                          .local_fire_department_rounded,
+                                      Icons.local_fire_department_rounded,
                                       color: Colors.white,
                                       size: 30,
                                     ),
@@ -611,16 +514,13 @@ class _YourFiresPageState extends State<YourFiresPage>
                                 const Spacer(),
 
                                 Container(
-                                  padding:
-                                  const EdgeInsets.symmetric(
+                                  padding: const EdgeInsets.symmetric(
                                     horizontal: 11,
                                     vertical: 7,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white
-                                        .withOpacity(0.16),
-                                    borderRadius:
-                                    BorderRadius.circular(20),
+                                    color: Colors.white.withValues(alpha: 0.16),
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: const Row(
                                     children: [
@@ -635,8 +535,7 @@ class _YourFiresPageState extends State<YourFiresPage>
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 10,
-                                          fontWeight:
-                                          FontWeight.bold,
+                                          fontWeight: FontWeight.bold,
                                           letterSpacing: 0.7,
                                         ),
                                       ),
@@ -673,8 +572,7 @@ class _YourFiresPageState extends State<YourFiresPage>
                             Row(
                               children: [
                                 YourFireSummary(
-                                  number:
-                                  '${incidents.length}',
+                                  number: '${incidents.length}',
                                   label: 'Total',
                                 ),
 
@@ -706,57 +604,42 @@ class _YourFiresPageState extends State<YourFiresPage>
               // showing report filters
               Row(
                 children: filters.map((filter) {
-                  final selected =
-                      selectedFilter == filter;
+                  final selected = selectedFilter == filter;
 
                   return Expanded(
                     child: Padding(
                       padding: EdgeInsets.only(
-                        right:
-                        filter == filters.last ? 0 : 9,
+                        right: filter == filters.last ? 0 : 9,
                       ),
                       child: GestureDetector(
                         onTap: () {
                           changeFilter(filter);
                         },
                         child: AnimatedContainer(
-                          duration:
-                          const Duration(milliseconds: 280),
+                          duration: const Duration(milliseconds: 280),
                           curve: Curves.easeOutCubic,
-                          padding:
-                          const EdgeInsets.symmetric(
-                            vertical: 12,
-                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: selected
-                                ? navy
-                                : Colors.white,
-                            borderRadius:
-                            BorderRadius.circular(16),
+                            color: selected ? navy : Colors.white,
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: selected
-                                  ? navy
-                                  : const Color(0xFFDCE5EE),
+                              color: selected ? navy : const Color(0xFFDCE5EE),
                             ),
                             boxShadow: selected
                                 ? [
-                              BoxShadow(
-                                color:
-                                navy.withOpacity(0.18),
-                                blurRadius: 14,
-                                offset:
-                                const Offset(0, 6),
-                              ),
-                            ]
+                                    BoxShadow(
+                                      color: navy.withValues(alpha: 0.18),
+                                      blurRadius: 14,
+                                      offset: const Offset(0, 6),
+                                    ),
+                                  ]
                                 : [],
                           ),
                           alignment: Alignment.center,
                           child: Text(
                             filter,
                             style: TextStyle(
-                              color: selected
-                                  ? Colors.white
-                                  : navy,
+                              color: selected ? Colors.white : navy,
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),
@@ -791,9 +674,8 @@ class _YourFiresPageState extends State<YourFiresPage>
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: coral.withOpacity(0.10),
-                      borderRadius:
-                      BorderRadius.circular(15),
+                      color: coral.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(15),
                     ),
                     child: Text(
                       '${filteredIncidents.length}',
@@ -819,63 +701,41 @@ class _YourFiresPageState extends State<YourFiresPage>
                 )
               else
                 Column(
-                  children: List.generate(
-                    filteredIncidents.length,
-                        (index) {
-                      final incident =
-                      filteredIncidents[index];
+                  children: List.generate(filteredIncidents.length, (index) {
+                    final incident = filteredIncidents[index];
 
-                      final status =
-                          incident['status']?.toString() ??
-                              'Submitted';
+                    final status =
+                        incident['status']?.toString() ?? 'Submitted';
 
-                      return TweenAnimationBuilder<double>(
-                        tween: Tween<double>(
-                          begin: 0,
-                          end: 1,
-                        ),
-                        duration: Duration(
-                          milliseconds:
-                          350 + (index * 80),
-                        ),
-                        curve: Curves.easeOutBack,
-                        builder: (
-                            context,
-                            animation,
-                            child,
-                            ) {
-                          return Opacity(
-                            opacity:
-                            animation.clamp(0.0, 1.0),
-                            child: Transform.translate(
-                              offset: Offset(
-                                30 * (1 - animation),
-                                0,
-                              ),
-                              child: child,
-                            ),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            bottom: 15,
+                    return TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0, end: 1),
+                      duration: Duration(milliseconds: 350 + (index * 80)),
+                      curve: Curves.easeOutBack,
+                      builder: (context, animation, child) {
+                        return Opacity(
+                          opacity: animation.clamp(0.0, 1.0),
+                          child: Transform.translate(
+                            offset: Offset(30 * (1 - animation), 0),
+                            child: child,
                           ),
-                          child: YourFireCard(
-                            incident: incident,
-                            date: formatDate(
-                              incident['updatedAt'] ??
-                                  incident['createdAt'],
-                            ),
-                            color: statusColor(status),
-                            icon: statusIcon(status),
-                            onPressed: () {
-                              openIncident(incident);
-                            },
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 15),
+                        child: YourFireCard(
+                          incident: incident,
+                          date: formatDate(
+                            incident['updatedAt'] ?? incident['createdAt'],
                           ),
+                          color: statusColor(status),
+                          icon: statusIcon(status),
+                          onPressed: () {
+                            openIncident(incident);
+                          },
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  }),
                 ),
             ],
           );
@@ -907,20 +767,13 @@ class YourFireCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title =
-        incident['title']?.toString() ??
-            'Campus incident';
+    final title = incident['title']?.toString() ?? 'Campus incident';
 
-    final status =
-        incident['status']?.toString() ??
-            'Submitted';
+    final status = incident['status']?.toString() ?? 'Submitted';
 
-    final location =
-        incident['location']?.toString() ??
-            'ALU Campus';
+    final location = incident['location']?.toString() ?? 'ALU Campus';
 
-    final imageUrl =
-        incident['imageUrl']?.toString() ?? '';
+    final imageUrl = incident['imageUrl']?.toString() ?? '';
 
     return Material(
       color: Colors.white,
@@ -933,12 +786,10 @@ class YourFireCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: coral.withOpacity(0.22),
-            ),
+            border: Border.all(color: coral.withValues(alpha: 0.22)),
             boxShadow: [
               BoxShadow(
-                color: navy.withOpacity(0.07),
+                color: navy.withValues(alpha: 0.07),
                 blurRadius: 22,
                 offset: const Offset(0, 9),
               ),
@@ -950,53 +801,40 @@ class YourFireCard extends StatelessWidget {
                 clipBehavior: Clip.none,
                 children: [
                   ClipRRect(
-                    borderRadius:
-                    BorderRadius.circular(17),
+                    borderRadius: BorderRadius.circular(17),
                     child: imageUrl.isNotEmpty
                         ? Image.network(
-                      imageUrl,
-                      width: 92,
-                      height: 108,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (
-                          context,
-                          child,
-                          progress,
-                          ) {
-                        if (progress == null) {
-                          return child;
-                        }
+                            imageUrl,
+                            width: 92,
+                            height: 108,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, progress) {
+                              if (progress == null) {
+                                return child;
+                              }
 
-                        return Container(
-                          width: 92,
-                          height: 108,
-                          color: background,
-                          alignment: Alignment.center,
-                          child: const SizedBox(
-                            width: 22,
-                            height: 22,
-                            child:
-                            CircularProgressIndicator(
-                              strokeWidth: 2,
-                            ),
-                          ),
-                        );
-                      },
-                      errorBuilder: (
-                          context,
-                          error,
-                          stackTrace,
-                          ) {
-                        return YourFirePlaceholder(
-                          color: color,
-                          icon: icon,
-                        );
-                      },
-                    )
-                        : YourFirePlaceholder(
-                      color: color,
-                      icon: icon,
-                    ),
+                              return Container(
+                                width: 92,
+                                height: 108,
+                                color: background,
+                                alignment: Alignment.center,
+                                child: const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return YourFirePlaceholder(
+                                color: color,
+                                icon: icon,
+                              );
+                            },
+                          )
+                        : YourFirePlaceholder(color: color, icon: icon),
                   ),
 
                   Positioned(
@@ -1008,10 +846,7 @@ class YourFireCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: coral,
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 3,
-                        ),
+                        border: Border.all(color: Colors.white, width: 3),
                       ),
                       child: const Icon(
                         Icons.local_fire_department_rounded,
@@ -1027,8 +862,7 @@ class YourFireCard extends StatelessWidget {
 
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     YourFireStatusBadge(
                       status: status,
@@ -1063,8 +897,7 @@ class YourFireCard extends StatelessWidget {
                           child: Text(
                             location,
                             maxLines: 1,
-                            overflow:
-                            TextOverflow.ellipsis,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: Colors.black54,
                               fontSize: 12,
@@ -1098,7 +931,7 @@ class YourFireCard extends StatelessWidget {
                           width: 28,
                           height: 28,
                           decoration: BoxDecoration(
-                            color: navy.withOpacity(0.07),
+                            color: navy.withValues(alpha: 0.07),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -1121,10 +954,7 @@ class YourFireCard extends StatelessWidget {
 }
 
 class YourFireProgress extends StatelessWidget {
-  const YourFireProgress({
-    super.key,
-    required this.currentStatus,
-  });
+  const YourFireProgress({super.key, required this.currentStatus});
 
   final String currentStatus;
 
@@ -1140,9 +970,7 @@ class YourFireProgress extends StatelessWidget {
 
   int get currentIndex {
     final index = stages.indexWhere(
-          (stage) =>
-      stage.toLowerCase() ==
-          currentStatus.toLowerCase(),
+      (stage) => stage.toLowerCase() == currentStatus.toLowerCase(),
     );
 
     return index < 0 ? 0 : index;
@@ -1166,16 +994,10 @@ class YourFireProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress =
-        currentIndex / (stages.length - 1);
+    final progress = currentIndex / (stages.length - 1);
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(
-        14,
-        18,
-        14,
-        15,
-      ),
+      padding: const EdgeInsets.fromLTRB(14, 18, 14, 15),
       decoration: BoxDecoration(
         color: const Color(0xFFF4F7FB),
         borderRadius: BorderRadius.circular(20),
@@ -1204,8 +1026,7 @@ class YourFireProgress extends StatelessWidget {
                   height: 4,
                   decoration: BoxDecoration(
                     color: const Color(0xFFD7E0E9),
-                    borderRadius:
-                    BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
               ),
@@ -1219,13 +1040,11 @@ class YourFireProgress extends StatelessWidget {
                   child: FractionallySizedBox(
                     widthFactor: progress,
                     child: AnimatedContainer(
-                      duration:
-                      const Duration(milliseconds: 500),
+                      duration: const Duration(milliseconds: 500),
                       height: 4,
                       decoration: BoxDecoration(
                         color: coral,
-                        borderRadius:
-                        BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                   ),
@@ -1233,78 +1052,62 @@ class YourFireProgress extends StatelessWidget {
               ),
 
               Row(
-                children: List.generate(
-                  stages.length,
-                      (index) {
-                    final stage = stages[index];
-                    final completed =
-                        index <= currentIndex;
-                    final active =
-                        index == currentIndex;
+                children: List.generate(stages.length, (index) {
+                  final stage = stages[index];
+                  final completed = index <= currentIndex;
+                  final active = index == currentIndex;
 
-                    return Expanded(
-                      child: Column(
-                        children: [
-                          AnimatedContainer(
-                            duration: const Duration(
-                              milliseconds: 400,
-                            ),
-                            width: active ? 39 : 35,
-                            height: active ? 39 : 35,
-                            decoration: BoxDecoration(
+                  return Expanded(
+                    child: Column(
+                      children: [
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 400),
+                          width: active ? 39 : 35,
+                          height: active ? 39 : 35,
+                          decoration: BoxDecoration(
+                            color: completed ? coral : Colors.white,
+                            shape: BoxShape.circle,
+                            border: Border.all(
                               color: completed
                                   ? coral
-                                  : Colors.white,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: completed
-                                    ? coral
-                                    : const Color(
-                                  0xFFD7E0E9,
-                                ),
-                                width: 2,
-                              ),
-                              boxShadow: active
-                                  ? [
-                                BoxShadow(
-                                  color: coral
-                                      .withOpacity(0.25),
-                                  blurRadius: 12,
-                                  spreadRadius: 3,
-                                ),
-                              ]
-                                  : [],
+                                  : const Color(0xFFD7E0E9),
+                              width: 2,
                             ),
-                            child: Icon(
-                              stageIcon(stage),
-                              color: completed
-                                  ? Colors.white
-                                  : Colors.black38,
-                              size: 18,
+                            boxShadow: active
+                                ? [
+                                    BoxShadow(
+                                      color: coral.withValues(alpha: 0.25),
+                                      blurRadius: 12,
+                                      spreadRadius: 3,
+                                    ),
+                                  ]
+                                : [],
+                          ),
+                          child: Icon(
+                            stageIcon(stage),
+                            color: completed ? Colors.white : Colors.black38,
+                            size: 18,
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        FittedBox(
+                          child: Text(
+                            stage,
+                            style: TextStyle(
+                              color: completed ? navy : Colors.black38,
+                              fontSize: 10,
+                              fontWeight: active
+                                  ? FontWeight.bold
+                                  : FontWeight.w500,
                             ),
                           ),
-
-                          const SizedBox(height: 8),
-
-                          FittedBox(
-                            child: Text(
-                              stage,
-                              style: TextStyle(
-                                color: completed
-                                    ? navy
-                                    : Colors.black38,
-                                fontSize: 10,
-                                fontWeight: active
-                                    ? FontWeight.bold
-                                    : FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
               ),
             ],
           ),
@@ -1329,22 +1132,15 @@ class YourFireStatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 9,
-        vertical: 6,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.11),
+        color: color.withValues(alpha: 0.11),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            color: color,
-            size: 13,
-          ),
+          Icon(icon, color: color, size: 13),
           const SizedBox(width: 5),
           Text(
             status,
@@ -1385,27 +1181,18 @@ class YourFireInformationTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: navy,
-          ),
+          Icon(icon, color: navy),
           const SizedBox(width: 11),
           Text(
             '$title:',
-            style: const TextStyle(
-              color: Colors.black54,
-              fontSize: 13,
-            ),
+            style: const TextStyle(color: Colors.black54, fontSize: 13),
           ),
           const SizedBox(width: 6),
           Expanded(
             child: Text(
               value,
               textAlign: TextAlign.right,
-              style: const TextStyle(
-                color: navy,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(color: navy, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -1415,11 +1202,7 @@ class YourFireInformationTile extends StatelessWidget {
 }
 
 class YourFireSummary extends StatelessWidget {
-  const YourFireSummary({
-    super.key,
-    required this.number,
-    required this.label,
-  });
+  const YourFireSummary({super.key, required this.number, required this.label});
 
   final String number;
   final String label;
@@ -1428,11 +1211,9 @@ class YourFireSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          vertical: 11,
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 11),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.16),
+          color: Colors.white.withValues(alpha: 0.16),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -1448,10 +1229,7 @@ class YourFireSummary extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 10,
-              ),
+              style: const TextStyle(color: Colors.white70, fontSize: 10),
             ),
           ],
         ),
@@ -1480,26 +1258,18 @@ class YourFirePlaceholder extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            color.withOpacity(0.10),
-            color.withOpacity(0.25),
+            color.withValues(alpha: 0.10),
+            color.withValues(alpha: 0.25),
           ],
         ),
       ),
-      child: Icon(
-        icon,
-        color: color,
-        size: 37,
-      ),
+      child: Icon(icon, color: color, size: 37),
     );
   }
 }
 
 class YourFiresEmpty extends StatelessWidget {
-  const YourFiresEmpty({
-    super.key,
-    required this.title,
-    required this.message,
-  });
+  const YourFiresEmpty({super.key, required this.title, required this.message});
 
   final String title;
   final String message;
@@ -1507,10 +1277,7 @@ class YourFiresEmpty extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 25,
-        vertical: 55,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 55),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -1537,10 +1304,7 @@ class YourFiresEmpty extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.black54,
-              height: 1.4,
-            ),
+            style: const TextStyle(color: Colors.black54, height: 1.4),
           ),
         ],
       ),
@@ -1549,10 +1313,7 @@ class YourFiresEmpty extends StatelessWidget {
 }
 
 class YourFiresError extends StatelessWidget {
-  const YourFiresError({
-    super.key,
-    required this.message,
-  });
+  const YourFiresError({super.key, required this.message});
 
   final String message;
 
@@ -1564,11 +1325,7 @@ class YourFiresError extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.cloud_off_rounded,
-              color: Colors.red,
-              size: 55,
-            ),
+            const Icon(Icons.cloud_off_rounded, color: Colors.red, size: 55),
             const SizedBox(height: 14),
             const Text(
               'Your reports could not be loaded',
@@ -1582,9 +1339,7 @@ class YourFiresError extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.black54,
-              ),
+              style: const TextStyle(color: Colors.black54),
             ),
           ],
         ),
